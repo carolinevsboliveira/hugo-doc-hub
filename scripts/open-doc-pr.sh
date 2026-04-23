@@ -56,6 +56,24 @@ else
     # Clone já traz o estado mais recente — fetch implícito
 fi
 
+# Valida se o time existe em data/teams.yaml
+TEAMS_FILE="data/teams.yaml"
+if [[ ! -f "$TEAMS_FILE" ]]; then
+    echo "Erro: $TEAMS_FILE não encontrado no docs-hub."
+    exit 1
+fi
+
+VALID_TEAMS=$(grep "^  - id:" "$TEAMS_FILE" | sed 's/  - id: //')
+if ! echo "$VALID_TEAMS" | grep -qx "$TEAM"; then
+    echo "Erro: time '$TEAM' não está cadastrado no docs-hub."
+    echo ""
+    echo "Times disponíveis:"
+    echo "$VALID_TEAMS" | sed 's/^/  - /'
+    echo ""
+    echo "Para adicionar o time, edite $TEAMS_FILE no docs-hub e abra um PR."
+    exit 1
+fi
+
 # Recria a branch do zero caso já exista de um run anterior
 git branch -D "$BRANCH" 2>/dev/null || true
 git checkout -b "$BRANCH"
