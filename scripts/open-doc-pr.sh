@@ -20,20 +20,44 @@ SOURCE_PR="$3"
 SOURCE_PR_URL="$4"
 DOCS_DIR="$5"
 
-: "${DOCHUB_REPO:?Defina a variável DOCHUB_REPO (ex: export DOCHUB_REPO=org/docs-hub)}"
 : "${TEAM:?Argumento 1 (team) obrigatório}"
 : "${PROJECT:?Argumento 2 (project) obrigatório}"
 : "${SOURCE_PR:?Argumento 3 (pr_number) obrigatório}"
 : "${DOCS_DIR:?Argumento 5 (docs_dir) obrigatório}"
 
+if [[ -z "$DOCHUB_PATH" && -z "$DOCHUB_REPO" ]]; then
+    echo "Erro: defina DOCHUB_PATH ou DOCHUB_REPO"
+    exit 1
+fi
+
 BRANCH="docs/${TEAM}/${PROJECT}/pr-${SOURCE_PR}"
 DEST="content/teams/${TEAM}"
 
-echo "→ Clonando ${DOCHUB_REPO}..."
-CLONE_DIR=$(mktemp -d)
-gh repo clone "$DOCHUB_REPO" "$CLONE_DIR" -- --quiet
+# Usa path local se disponível, clona se não
+if [[ -n "$DOCHUB_PATH" && -d "$DOCHUB_PATH/.git" ]]; then
+    echo "→ Usando repo local: ${DOCHUB_PATH}"
+    HUB_DIR="$DOCHUB_PATH"
+    cd "$HUB_DIR"
 
-cd "$CLONE_DIR"
+    # Garante estado limpo antes de qualquer operação
+    git fetch origin --quiet
+    git checkout main --quiet
+    git reset --hard origin/main --quiet
+
+    # Deriva DOCHUB_REPO do remote caso não tenha sido passado
+    if [[ -z "$DOCHUB_REPO" ]]; then
+        DOCHUB_REPO=$(gh repo view --json nameWithOwner --jq '.nameWithOwner')
+    fi
+else
+    echo "→ Clonando ${DOCHUB_REPO}..."
+    HUB_DIR=$(mktemp -d)
+    gh repo clone "$DOCHUB_REPO" "$HUB_DIR" -- --quiet
+    cd "$HUB_DIR"
+    # Clone já traz o estado mais recente — fetch implícito
+fi
+
+# Recria a branch do zero caso já exista de um run anterior
+git branch -D "$BRANCH" 2>/dev/null || true
 git checkout -b "$BRANCH"
 
 echo "→ Copiando arquivos gerados..."

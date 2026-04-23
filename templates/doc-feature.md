@@ -93,16 +93,19 @@ Onde `{slug}` = nome da feature em kebab-case, máximo 50 chars.
 ### 7. Abrir PR no docs-hub
 
 ```bash
-gh api "repos/$DOCHUB_REPO/contents/scripts/open-doc-pr.sh" \
-    --jq '.content' | base64 -d > /tmp/open-doc-pr.sh
-chmod +x /tmp/open-doc-pr.sh
+source .dochubrc
 
-bash /tmp/open-doc-pr.sh \
-    "$TEAM" \
-    "$PROJECT" \
-    "feature-$SLUG" \
-    "" \
-    "/tmp/dochub-docs-feature-$SLUG"
+if [[ -n "$DOCHUB_PATH" && -f "$DOCHUB_PATH/scripts/open-doc-pr.sh" ]]; then
+    OPEN_SCRIPT="$DOCHUB_PATH/scripts/open-doc-pr.sh"
+else
+    gh api "repos/$DOCHUB_REPO/contents/scripts/open-doc-pr.sh" \
+        --jq '.content' | base64 -d > /tmp/open-doc-pr.sh
+    chmod +x /tmp/open-doc-pr.sh
+    OPEN_SCRIPT="/tmp/open-doc-pr.sh"
+fi
+
+DOCHUB_PATH="$DOCHUB_PATH" DOCHUB_REPO="$DOCHUB_REPO" \
+bash "$OPEN_SCRIPT" "$TEAM" "$PROJECT" "feature-$SLUG" "" "/tmp/dochub-docs-feature-$SLUG"
 ```
 
 ---

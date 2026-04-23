@@ -80,20 +80,23 @@ Onde `{slug}` = título do PR em kebab-case, máximo 50 chars.
 ### 6. Abrir o PR no docs-hub
 
 ```bash
-# Baixa o script do docs-hub
-gh api "repos/$DOCHUB_REPO/contents/scripts/open-doc-pr.sh" \
-    --jq '.content' | base64 -d > /tmp/open-doc-pr.sh
-chmod +x /tmp/open-doc-pr.sh
+source .dochubrc
+
+# Usa script local se disponível, senão baixa via gh
+if [[ -n "$DOCHUB_PATH" && -f "$DOCHUB_PATH/scripts/open-doc-pr.sh" ]]; then
+    OPEN_SCRIPT="$DOCHUB_PATH/scripts/open-doc-pr.sh"
+else
+    gh api "repos/$DOCHUB_REPO/contents/scripts/open-doc-pr.sh" \
+        --jq '.content' | base64 -d > /tmp/open-doc-pr.sh
+    chmod +x /tmp/open-doc-pr.sh
+    OPEN_SCRIPT="/tmp/open-doc-pr.sh"
+fi
 
 CURRENT_REPO=$(gh repo view --json nameWithOwner --jq '.nameWithOwner')
 SOURCE_PR_URL="https://github.com/$CURRENT_REPO/pull/$NUMERO"
 
-bash /tmp/open-doc-pr.sh \
-    "$TEAM" \
-    "$PROJECT" \
-    "$NUMERO" \
-    "$SOURCE_PR_URL" \
-    "/tmp/dochub-docs-$NUMERO"
+DOCHUB_PATH="$DOCHUB_PATH" DOCHUB_REPO="$DOCHUB_REPO" \
+bash "$OPEN_SCRIPT" "$TEAM" "$PROJECT" "$NUMERO" "$SOURCE_PR_URL" "/tmp/dochub-docs-$NUMERO"
 ```
 
 ---
