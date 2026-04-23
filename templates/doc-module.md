@@ -86,13 +86,22 @@ Determine o caminho de destino dos arquivos:
 
 ### 6. Confirmar antes de abrir o PR
 
-Exiba os caminhos dos arquivos gerados e uma prévia de cada um (título e primeiras seções). Em seguida, pergunte:
+Exiba os caminhos dos arquivos gerados e uma prévia de cada um (título e primeiras seções).
 
-> Posso abrir o PR no docs-hub com esses arquivos? (sim/não)
+Em seguida, pergunte (padrão **não**):
 
-Aguarde confirmação. Se não, pergunte o que ajustar, corrija e repita esta etapa.
+> Deseja abrir um PR no docs-hub agora, ou prefere revisar os arquivos localmente antes? [PR/local] (padrão: local)
+
+- Se **local**: informe os caminhos dos arquivos gerados e encerre. O usuário pode abrir o PR manualmente depois.
+- Se **PR**: pergunte a confirmação final:
+
+  > Posso abrir o PR no docs-hub com esses arquivos? (sim/não)
+
+  Aguarde confirmação. Se não, pergunte o que ajustar, corrija e repita esta etapa.
 
 ### 7. Abrir PR no docs-hub
+
+> Execute apenas se o usuário escolheu **PR** na etapa anterior.
 
 ```bash
 source .dochubrc
