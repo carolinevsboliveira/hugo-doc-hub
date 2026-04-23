@@ -53,11 +53,15 @@ Leia `TEAMS` do `.dochubrc` e divida por vírgula.
 
 ### 3. Verificar pré-requisitos
 
+Se `USE_GITHUB=true` no `.dochubrc`:
+
 ```bash
 gh auth status
 ```
 
 Se não autenticado, oriente o usuário a rodar `gh auth login` e interrompa.
+
+Se `USE_GITHUB=false`, pule esta etapa.
 
 ### 4. Coletar contexto do PR
 

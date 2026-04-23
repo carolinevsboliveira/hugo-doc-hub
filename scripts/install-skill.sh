@@ -37,7 +37,10 @@ git rev-parse --git-dir > /dev/null 2>&1 || { echo "Erro: rode dentro de um repo
 
 echo ""
 read -rp "Você vai usar o GitHub para abrir PRs de documentação? (sim/não): " use_github
-if [[ "$use_github" != "sim" && "$use_github" != "s" ]]; then
+if [[ "$use_github" == "sim" || "$use_github" == "s" ]]; then
+    USE_GITHUB=true
+else
+    USE_GITHUB=false
     echo ""
     echo "Aviso: atualmente o DocHub só tem suporte completo via GitHub."
     echo "As skills serão instaladas, mas a abertura automática de PRs não funcionará"
@@ -143,6 +146,7 @@ DOCHUB_PATH=$DOCHUB_PATH
 TEAMS=$TEAMS
 PROJECT=$PROJECT
 DOC_TYPES=$DOC_TYPES
+USE_GITHUB=$USE_GITHUB
 EOF
 
 echo ""

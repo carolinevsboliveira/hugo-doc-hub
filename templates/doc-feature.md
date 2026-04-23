@@ -49,9 +49,15 @@ Antes de coletar qualquer dado, pergunte ao usuário o que não foi passado no c
 
 ### 4. Verificar pré-requisitos
 
+Se `USE_GITHUB=true` no `.dochubrc`:
+
 ```bash
 gh auth status
 ```
+
+Se não autenticado, oriente o usuário a rodar `gh auth login` e interrompa.
+
+Se `USE_GITHUB=false`, pule esta etapa.
 
 ### 5. Coletar contexto
 
