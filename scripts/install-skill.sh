@@ -1,13 +1,16 @@
 #!/bin/bash
-# Instala a skill /doc-pr no repo atual (não globalmente).
+# Instala as skills /doc-pr, /doc-feature e /doc-module no repo atual (não globalmente).
 # Rode este script de dentro do repo que vai gerar documentação.
 #
-# Uso:
-#   bash <(gh api repos/ORG/docs-hub/contents/scripts/install-skill.sh --jq '.content' | base64 -d) \
+# Uso não-interativo (todos os valores via flags):
+#   bash install-skill.sh \
 #     --hub-repo org/docs-hub \
 #     --teams team-payments,team-checkout \
 #     --project payments-api \
 #     --doc-types technical,product,faq
+#
+# Uso interativo (omita as flags — o script pergunta):
+#   bash install-skill.sh
 
 set -e
 
@@ -28,18 +31,47 @@ while [[ $# -gt 0 ]]; do
     esac
 done
 
-: "${TEAMS:?Use --teams team-payments ou --teams team-payments,team-checkout}"
+git rev-parse --git-dir > /dev/null 2>&1 || { echo "Erro: rode dentro de um repositório git."; exit 1; }
 
-# Precisa de pelo menos um dos dois
+# --- Modo interativo: preenche o que não veio via flags ---
+
+if [[ -z "$DOCHUB_PATH" && -z "$DOCHUB_REPO" ]]; then
+    echo ""
+    read -rp "Você tem o docs-hub clonado localmente? Digite o caminho (ou Enter para pular): " DOCHUB_PATH
+    if [[ -n "$DOCHUB_PATH" ]]; then
+        # Expande ~ manualmente (read não faz isso)
+        DOCHUB_PATH="${DOCHUB_PATH/#\~/$HOME}"
+        if [[ ! -d "$DOCHUB_PATH/.git" ]]; then
+            echo "Aviso: '$DOCHUB_PATH' não parece um repositório git. Ignorando."
+            DOCHUB_PATH=""
+        fi
+    fi
+    if [[ -z "$DOCHUB_PATH" ]]; then
+        read -rp "Informe o repositório do docs-hub (ex: org/docs-hub): " DOCHUB_REPO
+    fi
+fi
+
 if [[ -z "$DOCHUB_REPO" && -z "$DOCHUB_PATH" ]]; then
-    echo "Erro: informe --hub-repo org/docs-hub ou --hub-path /caminho/local/docs-hub"
+    echo "Erro: é necessário informar --hub-repo org/docs-hub ou --hub-path /caminho/local/docs-hub"
     exit 1
 fi
 
+if [[ -z "$TEAMS" ]]; then
+    echo ""
+    read -rp "Times associados a este repo (ex: team-payments ou team-payments,team-checkout): " TEAMS
+fi
+
+: "${TEAMS:?Times não informados. Use --teams ou responda à pergunta acima.}"
+
 PROJECT="${PROJECT:-$(basename "$PWD")}"
 
-git rev-parse --git-dir > /dev/null 2>&1 || { echo "Erro: rode dentro de um repositório git."; exit 1; }
+if [[ -z "$DOC_TYPES" || "$DOC_TYPES" == "technical,product,faq" ]]; then
+    echo ""
+    read -rp "Tipos de documentação [technical,product,faq]: " input_types
+    DOC_TYPES="${input_types:-technical,product,faq}"
+fi
 
+echo ""
 echo "Instalando skills em $(pwd)..."
 
 mkdir -p .claude/commands
