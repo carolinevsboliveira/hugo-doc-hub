@@ -71,20 +71,28 @@ gh auth status
 
 ### 5. Gerar os arquivos
 
-Tipo gerado: sempre **technical**. Se `faq` estiver em `DOC_TYPES` do `.dochubrc`, gere também.
-Se `--only` foi passado, use apenas esses tipos.
+Tipo gerado: sempre **technical**. Se `faq` estiver em `DOC_TYPES` do `.dochubrc` (e `--only` não excluir), pergunte:
+
+> Deseja gerar também o FAQ? (sim/não)
+
+Se a resposta for não, gere apenas o `technical`.
 
 `{nome}` = último segmento do caminho (ex: `src/payments` → `payments`).
 `{slug}` = `{nome}` em kebab-case.
 
-Salve em `/tmp/dochub-docs-module-{slug}/`:
-```
-/tmp/dochub-docs-module-{slug}/
-├── technical/module-{slug}.md
-└── faq/faq-module-{slug}.md    ← se faq estiver em DOC_TYPES
-```
+Determine o caminho de destino dos arquivos:
+- Se `DOCHUB_PATH` estiver definido: salve em `$DOCHUB_PATH/content/teams/$TEAM/{doc_type}/module-{slug}.md`
+- Caso contrário: salve em `/tmp/dochub-docs-module-{slug}/{doc_type}/module-{slug}.md`
 
-### 6. Abrir PR no docs-hub
+### 6. Confirmar antes de abrir o PR
+
+Exiba os caminhos dos arquivos gerados e uma prévia de cada um (título e primeiras seções). Em seguida, pergunte:
+
+> Posso abrir o PR no docs-hub com esses arquivos? (sim/não)
+
+Aguarde confirmação. Se não, pergunte o que ajustar, corrija e repita esta etapa.
+
+### 7. Abrir PR no docs-hub
 
 ```bash
 source .dochubrc
@@ -98,8 +106,11 @@ else
     OPEN_SCRIPT="/tmp/open-doc-pr.sh"
 fi
 
+DOCS_DIR=""
+[[ -z "$DOCHUB_PATH" ]] && DOCS_DIR="/tmp/dochub-docs-module-$SLUG"
+
 DOCHUB_PATH="$DOCHUB_PATH" DOCHUB_REPO="$DOCHUB_REPO" \
-bash "$OPEN_SCRIPT" "$TEAM" "$PROJECT" "module-$SLUG" "" "/tmp/dochub-docs-module-$SLUG"
+bash "$OPEN_SCRIPT" "$TEAM" "$PROJECT" "module-$SLUG" "" "$DOCS_DIR"
 ```
 
 ---

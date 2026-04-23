@@ -102,6 +102,14 @@ fi
 
 # --- Escreve em data/teams.yaml ---
 
+# Garante que o arquivo começa com a chave raiz correta
+if [[ ! -f "$TEAMS_FILE" ]]; then
+    echo "teams:" > "$TEAMS_FILE"
+elif ! grep -q "^teams:" "$TEAMS_FILE"; then
+    echo "Erro: $TEAMS_FILE existe mas não contém a chave 'teams:'. Verifique o arquivo antes de continuar."
+    exit 1
+fi
+
 {
     echo ""
     echo "  - id: ${TEAM_ID}"

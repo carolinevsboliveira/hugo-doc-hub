@@ -71,18 +71,33 @@ gh pr view $NUMERO --json commits --jq '.commits[].messageHeadline'
 
 ### 5. Gerar os arquivos de documentação
 
-Para cada tipo em `DOC_TYPES` (ou `--only`), gere o arquivo usando o template correspondente abaixo.
+Determine os tipos a gerar: use `DOC_TYPES` do `.dochubrc` (ou `--only` se passado).
 
-Salve em `/tmp/dochub-docs-{número}/{doc_type}/pr-{número}-{slug}.md`
+Se `faq` estiver nos tipos, pergunte antes de gerar:
+
+> Deseja gerar também o FAQ? (sim/não)
+
+Se a resposta for não, remova `faq` da lista.
+
+Determine o caminho de destino dos arquivos:
+- Se `DOCHUB_PATH` estiver definido: salve em `$DOCHUB_PATH/content/teams/$TEAM/{doc_type}/pr-{número}-{slug}.md`
+- Caso contrário: salve em `/tmp/dochub-docs-{número}/{doc_type}/pr-{número}-{slug}.md`
 
 Onde `{slug}` = título do PR em kebab-case, máximo 50 chars.
 
-### 6. Abrir o PR no docs-hub
+### 6. Confirmar antes de abrir o PR
+
+Exiba os caminhos dos arquivos gerados e uma prévia de cada um (título e primeiras seções). Em seguida, pergunte:
+
+> Posso abrir o PR no docs-hub com esses arquivos? (sim/não)
+
+Aguarde confirmação. Se não, pergunte o que ajustar, corrija e repita esta etapa.
+
+### 7. Abrir o PR no docs-hub
 
 ```bash
 source .dochubrc
 
-# Usa script local se disponível, senão baixa via gh
 if [[ -n "$DOCHUB_PATH" && -f "$DOCHUB_PATH/scripts/open-doc-pr.sh" ]]; then
     OPEN_SCRIPT="$DOCHUB_PATH/scripts/open-doc-pr.sh"
 else
@@ -95,8 +110,12 @@ fi
 CURRENT_REPO=$(gh repo view --json nameWithOwner --jq '.nameWithOwner')
 SOURCE_PR_URL="https://github.com/$CURRENT_REPO/pull/$NUMERO"
 
+# Se DOCHUB_PATH disponível, arquivos já estão no lugar — passa DOCS_DIR vazio
+DOCS_DIR=""
+[[ -z "$DOCHUB_PATH" ]] && DOCS_DIR="/tmp/dochub-docs-$NUMERO"
+
 DOCHUB_PATH="$DOCHUB_PATH" DOCHUB_REPO="$DOCHUB_REPO" \
-bash "$OPEN_SCRIPT" "$TEAM" "$PROJECT" "$NUMERO" "$SOURCE_PR_URL" "/tmp/dochub-docs-$NUMERO"
+bash "$OPEN_SCRIPT" "$TEAM" "$PROJECT" "$NUMERO" "$SOURCE_PR_URL" "$DOCS_DIR"
 ```
 
 ---

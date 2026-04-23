@@ -78,13 +78,17 @@ fi
 git branch -D "$BRANCH" 2>/dev/null || true
 git checkout -b "$BRANCH"
 
-echo "→ Copiando arquivos gerados..."
-for type_dir in "${DOCS_DIR}"/*/; do
-    doc_type=$(basename "$type_dir")
-    target="${DEST}/${doc_type}"
-    mkdir -p "$target"
-    cp "$type_dir"*.md "$target/" 2>/dev/null || true
-done
+if [[ -n "$DOCS_DIR" ]]; then
+    echo "→ Copiando arquivos de ${DOCS_DIR}..."
+    for type_dir in "${DOCS_DIR}"/*/; do
+        doc_type=$(basename "$type_dir")
+        target="${DEST}/${doc_type}"
+        mkdir -p "$target"
+        cp "$type_dir"*.md "$target/" 2>/dev/null || true
+    done
+else
+    echo "→ Arquivos já em ${DEST} (DOCHUB_PATH local)"
+fi
 
 echo "→ Commitando..."
 git config user.name "DocHub Bot"

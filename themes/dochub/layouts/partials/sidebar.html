@@ -1,8 +1,8 @@
 <nav class="sidebar">
   <div class="sidebar-section">
     <span class="sidebar-label">Times</span>
-    {{ if .Site.Data.teams.teams }}
-      {{ range .Site.Data.teams.teams }}
+    {{ with .Site.Data.teams }}{{ with .teams }}
+      {{ range . }}
       {{ $teamId := .id }}
       {{ $isTeamActive := in $.RelPermalink $teamId }}
       <div class="sidebar-group {{ if $isTeamActive }}open{{ end }}">
@@ -44,7 +44,7 @@
         {{ end }}
       </div>
       {{ end }}
-    {{ end }}
+    {{ end }}{{ end }}
   </div>
 
   <div class="sidebar-section">

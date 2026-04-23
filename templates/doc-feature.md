@@ -80,17 +80,27 @@ Determine os tipos a gerar:
 - Default: `technical` e `product` sempre; `faq` se estiver em `DOC_TYPES` do `.dochubrc`
 - Se `--only` foi passado, use apenas esses tipos
 
-Salve em `/tmp/dochub-docs-feature-{slug}/`:
-```
-/tmp/dochub-docs-feature-{slug}/
-├── technical/feature-{slug}.md
-├── product/feature-{slug}.md
-└── faq/faq-{slug}.md
-```
+Se `faq` estiver nos tipos, pergunte antes de gerar:
+
+> Deseja gerar também o FAQ? (sim/não)
+
+Se a resposta for não, remova `faq` da lista.
+
+Determine o caminho de destino dos arquivos:
+- Se `DOCHUB_PATH` estiver definido: salve em `$DOCHUB_PATH/content/teams/$TEAM/{doc_type}/feature-{slug}.md`
+- Caso contrário: salve em `/tmp/dochub-docs-feature-{slug}/{doc_type}/feature-{slug}.md`
 
 Onde `{slug}` = nome da feature em kebab-case, máximo 50 chars.
 
-### 7. Abrir PR no docs-hub
+### 7. Confirmar antes de abrir o PR
+
+Exiba os caminhos dos arquivos gerados e uma prévia de cada um (título e primeiras seções). Em seguida, pergunte:
+
+> Posso abrir o PR no docs-hub com esses arquivos? (sim/não)
+
+Aguarde confirmação. Se não, pergunte o que ajustar, corrija e repita esta etapa.
+
+### 8. Abrir PR no docs-hub
 
 ```bash
 source .dochubrc
@@ -104,8 +114,11 @@ else
     OPEN_SCRIPT="/tmp/open-doc-pr.sh"
 fi
 
+DOCS_DIR=""
+[[ -z "$DOCHUB_PATH" ]] && DOCS_DIR="/tmp/dochub-docs-feature-$SLUG"
+
 DOCHUB_PATH="$DOCHUB_PATH" DOCHUB_REPO="$DOCHUB_REPO" \
-bash "$OPEN_SCRIPT" "$TEAM" "$PROJECT" "feature-$SLUG" "" "/tmp/dochub-docs-feature-$SLUG"
+bash "$OPEN_SCRIPT" "$TEAM" "$PROJECT" "feature-$SLUG" "" "$DOCS_DIR"
 ```
 
 ---

@@ -33,6 +33,23 @@ done
 
 git rev-parse --git-dir > /dev/null 2>&1 || { echo "Erro: rode dentro de um repositório git."; exit 1; }
 
+# --- Verifica suporte a GitHub ---
+
+echo ""
+read -rp "Você vai usar o GitHub para abrir PRs de documentação? (sim/não): " use_github
+if [[ "$use_github" != "sim" && "$use_github" != "s" ]]; then
+    echo ""
+    echo "Aviso: atualmente o DocHub só tem suporte completo via GitHub."
+    echo "As skills serão instaladas, mas a abertura automática de PRs não funcionará"
+    echo "sem autenticação no GitHub CLI (gh auth login)."
+    echo ""
+    read -rp "Deseja continuar mesmo assim? (sim/não): " continuar
+    if [[ "$continuar" != "sim" && "$continuar" != "s" ]]; then
+        echo "Instalação cancelada."
+        exit 0
+    fi
+fi
+
 # --- Modo interativo: preenche o que não veio via flags ---
 
 if [[ -z "$DOCHUB_PATH" && -z "$DOCHUB_REPO" ]]; then
