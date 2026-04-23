@@ -63,6 +63,40 @@ fi
 
 : "${TEAMS:?Times não informados. Use --teams ou responda à pergunta acima.}"
 
+# --- Valida os times contra data/teams.yaml do docs-hub ---
+
+if [[ -n "$DOCHUB_PATH" ]]; then
+    TEAMS_YAML="$DOCHUB_PATH/data/teams.yaml"
+    if [[ ! -f "$TEAMS_YAML" ]]; then
+        echo "Erro: $TEAMS_YAML não encontrado."
+        exit 1
+    fi
+    VALID_TEAMS=$(grep "^  - id:" "$TEAMS_YAML" | sed 's/  - id: //')
+else
+    VALID_TEAMS=$(gh api "repos/$DOCHUB_REPO/contents/data/teams.yaml" \
+        --jq '.content' | base64 -d | grep "^  - id:" | sed 's/  - id: //')
+fi
+
+INVALID=""
+IFS=',' read -ra TEAM_LIST <<< "$TEAMS"
+for t in "${TEAM_LIST[@]}"; do
+    t="${t// /}"  # remove espaços
+    if ! echo "$VALID_TEAMS" | grep -qx "$t"; then
+        INVALID="$INVALID $t"
+    fi
+done
+
+if [[ -n "$INVALID" ]]; then
+    echo ""
+    echo "Erro: os seguintes times não existem no docs-hub:$INVALID"
+    echo ""
+    echo "Times disponíveis:"
+    echo "$VALID_TEAMS" | sed 's/^/  - /'
+    echo ""
+    echo "Para cadastrar um novo time, edite data/teams.yaml no docs-hub e abra um PR."
+    exit 1
+fi
+
 PROJECT="${PROJECT:-$(basename "$PWD")}"
 
 if [[ -z "$DOC_TYPES" || "$DOC_TYPES" == "technical,product,faq" ]]; then
