@@ -30,7 +30,7 @@ cat .dochubrc
 Ele contém:
 ```
 DOCHUB_REPO=org/docs-hub
-TEAM=team-payments
+TEAMS=team-payments,team-checkout
 PROJECT=payments-api
 DOC_TYPES=technical,product,faq
 ```
@@ -39,7 +39,19 @@ Se `.dochubrc` não existir, informe ao usuário que precisa rodar o `install-sk
 
 Se `--only` foi passado, use esses tipos em vez de `DOC_TYPES`.
 
-### 2. Verificar pré-requisitos
+### 2. Determinar o time
+
+Leia `TEAMS` do `.dochubrc` e divida por vírgula.
+
+- **Se houver apenas um time:** use-o diretamente, sem perguntar.
+- **Se houver mais de um time:** pergunte ao usuário antes de continuar:
+
+  > Este repo está associado aos times: `team-payments`, `team-checkout`.
+  > Para qual time é esta documentação?
+
+  Aguarde a resposta antes de prosseguir. Use o time escolhido como `TEAM` no restante do fluxo.
+
+### 3. Verificar pré-requisitos
 
 ```bash
 gh auth status
@@ -47,7 +59,7 @@ gh auth status
 
 Se não autenticado, oriente o usuário a rodar `gh auth login` e interrompa.
 
-### 3. Coletar contexto do PR
+### 4. Coletar contexto do PR
 
 O repo atual é o repo de origem — não precisa de `--repo`.
 
@@ -57,7 +69,7 @@ gh pr diff $NUMERO | head -400
 gh pr view $NUMERO --json commits --jq '.commits[].messageHeadline'
 ```
 
-### 4. Gerar os arquivos de documentação
+### 5. Gerar os arquivos de documentação
 
 Para cada tipo em `DOC_TYPES` (ou `--only`), gere o arquivo usando o template correspondente abaixo.
 
@@ -65,7 +77,7 @@ Salve em `/tmp/dochub-docs-{número}/{doc_type}/pr-{número}-{slug}.md`
 
 Onde `{slug}` = título do PR em kebab-case, máximo 50 chars.
 
-### 5. Abrir o PR no docs-hub
+### 6. Abrir o PR no docs-hub
 
 ```bash
 # Baixa o script do docs-hub
