@@ -18,10 +18,16 @@
           {{ if eq . "product" }}{{ $typeIcon = "📦" }}{{ end }}
           {{ if eq . "faq" }}{{ $typeIcon = "❓" }}{{ end }}
 
+          {{ $typeLabel := . | title }}
+          {{ if eq . "technical" }}{{ $typeLabel = "Técnico" }}{{ end }}
+          {{ if eq . "product" }}{{ $typeLabel = "Produto" }}{{ end }}
+          {{ if eq . "faq" }}{{ $typeLabel = "FAQ" }}{{ end }}
+          {{ if eq . "module" }}{{ $typeLabel = "Módulo" }}{{ end }}
+
           <div class="sidebar-subgroup">
             <button class="sidebar-subgroup-title" data-toggle="subgroup-{{ $teamId }}-{{ . }}">
               <span class="chevron-right">›</span>
-              <span>{{ $typeIcon }} {{ . | title }}</span>
+              <span>{{ $typeIcon }} {{ $typeLabel }}</span>
             </button>
             <div id="subgroup-{{ $teamId }}-{{ . }}" class="sidebar-subgroup-items">
               {{ $teamPage := $.Site.GetPage (printf "sections" "teams" $teamId .) }}
