@@ -12,6 +12,14 @@
     </main>
   </div>
   {{ partial "footer.html" . }}
-  <script src="/js/search.js"></script>
+  {{- with resources.Get "js/main.js" }}
+    {{- if eq hugo.Environment "development" }}
+      <script src="{{ .RelPermalink }}"></script>
+    {{- else }}
+      {{- with . | minify }}
+        <script src="{{ .RelPermalink }}"></script>
+      {{- end }}
+    {{- end }}
+  {{- end }}
 </body>
 </html>

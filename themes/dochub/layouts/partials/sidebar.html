@@ -1,19 +1,38 @@
 <nav class="sidebar">
   <div class="sidebar-section">
     <span class="sidebar-label">Times</span>
-    {{ $teams := .Site.GetPage "section" "teams" }}
-    {{ if $teams }}
-      {{ range $teams.Sections }}
-      <div class="sidebar-group {{ if hasPrefix $.RelPermalink .RelPermalink }}open{{ end }}">
-        <a class="sidebar-group-title" href="{{ .RelPermalink }}">
-          <span>{{ .Title }}</span>
+    {{ if .Site.Data.teams.teams }}
+      {{ range .Site.Data.teams.teams }}
+      {{ $teamId := .id }}
+      {{ $isTeamActive := in $.RelPermalink $teamId }}
+      <div class="sidebar-group {{ if $isTeamActive }}open{{ end }}">
+        <a class="sidebar-group-title" href="/teams/{{ .id }}/">
+          <span>{{ .name }}</span>
           <span class="chevron">›</span>
         </a>
-        {{ if hasPrefix $.RelPermalink .RelPermalink }}
+        {{ if $isTeamActive }}
         <div class="sidebar-group-items">
-          {{ range .Sections }}
-          <a class="sidebar-item {{ if eq $.RelPermalink .RelPermalink }}active{{ end }}"
-             href="{{ .RelPermalink }}">{{ .Title }}</a>
+          {{ range .doc_types }}
+          {{ $typeIcon := "" }}
+          {{ if eq . "technical" }}{{ $typeIcon = "⚙" }}{{ end }}
+          {{ if eq . "product" }}{{ $typeIcon = "📦" }}{{ end }}
+          {{ if eq . "faq" }}{{ $typeIcon = "❓" }}{{ end }}
+
+          <div class="sidebar-subgroup">
+            <button class="sidebar-subgroup-title" data-toggle="subgroup-{{ $teamId }}-{{ . }}">
+              <span class="chevron-right">›</span>
+              <span>{{ $typeIcon }} {{ . | title }}</span>
+            </button>
+            <div id="subgroup-{{ $teamId }}-{{ . }}" class="sidebar-subgroup-items">
+              {{ $teamPage := $.Site.GetPage (printf "sections" "teams" $teamId .) }}
+              {{ if $teamPage }}
+                {{ range $teamPage.RegularPages }}
+                <a class="sidebar-subitem {{ if eq $.RelPermalink .RelPermalink }}active{{ end }}"
+                   href="{{ .RelPermalink }}">{{ .Title }}</a>
+                {{ end }}
+              {{ end }}
+            </div>
+          </div>
           {{ end }}
         </div>
         {{ end }}

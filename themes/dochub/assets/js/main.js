@@ -72,4 +72,21 @@ document.addEventListener('DOMContentLoaded', () => {
       results.classList.add('hidden');
     }
   });
+
+  // Toggle para subgrupos da sidebar
+  document.querySelectorAll('.sidebar-subgroup-title').forEach(btn => {
+    const subgroupId = btn.getAttribute('data-toggle');
+    const subgroupItems = document.getElementById(subgroupId);
+
+    // Mostrar subgrupo se houver item ativo dentro
+    if (subgroupItems?.querySelector('.sidebar-subitem.active')) {
+      subgroupItems.classList.add('show');
+    }
+
+    btn.addEventListener('click', (e) => {
+      e.preventDefault();
+      btn.classList.toggle('collapsed');
+      subgroupItems.classList.toggle('show');
+    });
+  });
 });

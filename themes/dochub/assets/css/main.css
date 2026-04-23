@@ -117,6 +117,23 @@ a:hover { text-decoration: underline; }
   padding: 0 8px;
   margin-bottom: 6px;
 }
+
+.teams-grid {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 6px;
+  padding: 0 8px;
+  margin-bottom: 12px;
+}
+
+.team-link {
+  display: block; padding: 8px 10px; border-radius: 6px;
+  background: var(--surface2); color: var(--muted);
+  font-size: 0.8rem; font-weight: 500; text-align: center;
+  transition: background 0.1s, color 0.1s, border-color 0.1s;
+  border: 1px solid transparent;
+}
+
+.team-link:hover { background: var(--border); color: var(--text); text-decoration: none; }
+.team-link.active { background: rgba(91,138,245,0.12); color: var(--accent); border-color: var(--accent); }
 .sidebar-item {
   display: block; padding: 6px 10px; border-radius: 6px;
   color: var(--muted); font-size: 0.875rem;
@@ -132,8 +149,40 @@ a:hover { text-decoration: underline; }
   transition: background 0.1s;
 }
 .sidebar-group-title:hover { background: var(--surface2); text-decoration: none; }
-.sidebar-group-items { padding-left: 10px; margin-top: 2px; }
+.sidebar-group-items { padding-left: 0; margin-top: 2px; }
 .chevron { color: var(--muted); font-size: 1rem; }
+
+.sidebar-subgroup { margin-bottom: 2px; }
+.sidebar-subgroup-title {
+  display: flex; align-items: center; gap: 8px;
+  padding: 6px 10px; border-radius: 6px;
+  color: var(--muted); font-size: 0.875rem; font-weight: 500;
+  background: none; border: none; cursor: pointer;
+  transition: background 0.1s, color 0.1s;
+  width: 100%; text-align: left;
+  font-family: inherit;
+}
+.sidebar-subgroup-title:hover { background: var(--surface2); color: var(--text); text-decoration: none; }
+.chevron-right { color: var(--muted); font-size: 0.9rem; transition: transform 0.15s; }
+.sidebar-subgroup-title.collapsed .chevron-right { transform: rotate(-90deg); }
+
+.sidebar-subgroup-items {
+  padding-left: 16px; margin-top: 2px;
+  display: none;
+  max-height: 500px;
+  overflow: hidden;
+  transition: max-height 0.15s;
+}
+.sidebar-subgroup-items.show { display: block; }
+
+.sidebar-subitem {
+  display: block; padding: 4px 10px; border-radius: 4px;
+  color: var(--muted); font-size: 0.8rem;
+  transition: background 0.1s, color 0.1s;
+  margin-bottom: 2px;
+}
+.sidebar-subitem:hover { background: var(--surface2); color: var(--text); text-decoration: none; }
+.sidebar-subitem.active { background: rgba(91,138,245,0.12); color: var(--accent); font-weight: 500; }
 
 /* ── Main ────────────────────────────────────────────── */
 .main { flex: 1; min-width: 0; padding: 40px 48px; max-width: 860px; }

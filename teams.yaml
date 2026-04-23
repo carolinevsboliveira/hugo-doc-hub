@@ -26,3 +26,24 @@ teams:
     repos:
       - infra-terraform
     doc_types: [technical]
+
+  - id: team-api
+    name: "API"
+    slack: "#team-api"
+    repos:
+      - api-core
+    doc_types: [technical, product, faq]
+
+  - id: team-mobile
+    name: "Mobile"
+    slack: "#team-mobile"
+    repos:
+      - mobile-app
+    doc_types: [technical, product, faq]
+
+  - id: team-frontend
+    name: "Frontend"
+    slack: "#team-frontend"
+    repos:
+      - frontend-app
+    doc_types: [technical, product, faq]
