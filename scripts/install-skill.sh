@@ -1,33 +1,67 @@
 #!/bin/bash
-# Instala a skill /doc-pr globalmente no Claude Code.
-# Após isso, o comando /doc-pr fica disponível em qualquer repo.
+# Instala a skill /doc-pr no repo atual (não globalmente).
+# Rode este script de dentro do repo que vai gerar documentação.
 #
 # Uso:
-#   curl -fsSL https://raw.githubusercontent.com/SEU-ORG/docs-hub/main/scripts/install-skill.sh | bash
-#   ou:
-#   bash scripts/install-skill.sh
+#   bash <(gh api repos/ORG/docs-hub/contents/scripts/install-skill.sh --jq '.content' | base64 -d) \
+#     --hub-repo org/docs-hub \
+#     --team team-payments \
+#     --project payments-api \
+#     --doc-types technical,product,faq
+#
+# Ou, se já clonou o docs-hub:
+#   bash /caminho/para/docs-hub/scripts/install-skill.sh --hub-repo org/docs-hub --team team-payments
 
 set -e
 
-SKILL_SRC="templates/global-skill-doc-pr.md"
-SKILL_DST="$HOME/.claude/commands/doc-pr.md"
+DOCHUB_REPO=""
+TEAM=""
+PROJECT=""
+DOC_TYPES="technical,product,faq"
 
-mkdir -p "$HOME/.claude/commands"
+while [[ $# -gt 0 ]]; do
+    case $1 in
+        --hub-repo)   DOCHUB_REPO="$2"; shift 2 ;;
+        --team)       TEAM="$2";        shift 2 ;;
+        --project)    PROJECT="$2";     shift 2 ;;
+        --doc-types)  DOC_TYPES="$2";   shift 2 ;;
+        *) echo "Opção desconhecida: $1"; exit 1 ;;
+    esac
+done
 
-if [ -f "$SKILL_SRC" ]; then
-    cp "$SKILL_SRC" "$SKILL_DST"
-else
-    # Baixa direto do repo se não estiver clonado
-    : "${DOCHUB_REPO:?Defina DOCHUB_REPO antes de rodar}"
-    gh api "repos/$DOCHUB_REPO/contents/templates/global-skill-doc-pr.md" \
-        --jq '.content' | base64 -d > "$SKILL_DST"
-fi
+: "${DOCHUB_REPO:?Use --hub-repo org/docs-hub}"
+: "${TEAM:?Use --team team-payments}"
 
-echo "✓ Skill instalada em $SKILL_DST"
+# Default: nome da pasta atual
+PROJECT="${PROJECT:-$(basename "$PWD")}"
+
+# Verifica se está dentro de um repo git
+git rev-parse --git-dir > /dev/null 2>&1 || { echo "Erro: rode dentro de um repositório git."; exit 1; }
+
+echo "Instalando skill /doc-pr em $(pwd)..."
+
+mkdir -p .claude/commands
+
+# Baixa o template da skill do docs-hub
+gh api "repos/$DOCHUB_REPO/contents/templates/doc-pr.md" \
+    --jq '.content' | base64 -d > .claude/commands/doc-pr.md
+
+# Cria o arquivo de configuração local
+cat > .dochubrc <<EOF
+DOCHUB_REPO=$DOCHUB_REPO
+TEAM=$TEAM
+PROJECT=$PROJECT
+DOC_TYPES=$DOC_TYPES
+EOF
+
 echo ""
-echo "Próximo passo — adicione ao seu ~/.zshrc ou ~/.bashrc:"
+echo "✓ Skill instalada em .claude/commands/doc-pr.md"
+echo "✓ Configuração salva em .dochubrc"
 echo ""
-echo "  export DOCHUB_REPO=\"sua-org/docs-hub\""
+echo "  DOCHUB_REPO = $DOCHUB_REPO"
+echo "  TEAM        = $TEAM"
+echo "  PROJECT     = $PROJECT"
+echo "  DOC_TYPES   = $DOC_TYPES"
 echo ""
-echo "Depois rode: source ~/.zshrc"
-echo "E teste com: /doc-pr 1 --repo sua-org/seu-projeto --team team-x"
+echo "Use: /doc-pr 142"
+echo "     /doc-pr 142 --only technical"
