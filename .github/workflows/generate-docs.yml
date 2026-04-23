@@ -1,0 +1,79 @@
+name: Generate Documentation
+# Workflow reutilizável — chamado por repos dos times via workflow_call
+
+on:
+  workflow_call:
+    inputs:
+      team:
+        description: 'ID do time (ex: team-payments)'
+        type: string
+        required: true
+      project-name:
+        description: 'Nome do projeto/repositório'
+        type: string
+        required: true
+      hub-repo:
+        description: 'Repo central (ex: your-org/docs-hub)'
+        type: string
+        required: true
+      doc-types:
+        description: 'Tipos a gerar separados por vírgula: technical,product,faq'
+        type: string
+        default: 'technical'
+      model:
+        description: 'Modelo Claude a usar'
+        type: string
+        default: 'claude-haiku-4-5-20251001'
+    secrets:
+      ANTHROPIC_API_KEY:
+        required: true
+      HUB_DEPLOY_TOKEN:
+        required: true
+
+jobs:
+  generate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout projeto
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Instalar dependências
+        run: pip install anthropic
+
+      - name: Coletar contexto do PR/projeto
+        run: |
+          chmod +x scripts/collect-context.sh
+          scripts/collect-context.sh > /tmp/context.json
+        env:
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          PR_TITLE:  ${{ github.event.pull_request.title }}
+          PR_BODY:   ${{ github.event.pull_request.body }}
+
+      - name: Gerar documentação com Claude
+        run: |
+          python scripts/generate-docs.py \
+            --context   /tmp/context.json \
+            --doc-types "${{ inputs.doc-types }}" \
+            --project   "${{ inputs.project-name }}" \
+            --team      "${{ inputs.team }}" \
+            --output    /tmp/docs/
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+
+      - name: Push para docs-hub
+        run: |
+          chmod +x scripts/push-to-hub.sh
+          scripts/push-to-hub.sh
+        env:
+          HUB_REPO:   ${{ inputs.hub-repo }}
+          TEAM:       ${{ inputs.team }}
+          PROJECT:    ${{ inputs.project-name }}
+          GH_TOKEN:   ${{ secrets.HUB_DEPLOY_TOKEN }}
+          DOCS_PATH:  /tmp/docs/

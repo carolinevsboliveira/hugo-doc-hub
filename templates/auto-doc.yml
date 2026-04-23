@@ -1,0 +1,21 @@
+# Copie este arquivo para .github/workflows/auto-doc.yml no seu repositório
+# e edite os 3 campos marcados com TODO
+
+name: Auto Documentation
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+    branches: [main]
+
+jobs:
+  generate-docs:
+    uses: your-org/docs-hub/.github/workflows/generate-docs.yml@main
+    with:
+      team: "TODO: team-payments"          # ID do time em teams.yaml
+      project-name: "TODO: payments-api"   # nome deste repositório
+      hub-repo: "your-org/docs-hub"        # repo central (não mude)
+      doc-types: "TODO: technical,product" # technical | product | faq
+    secrets:
+      ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+      HUB_DEPLOY_TOKEN:  ${{ secrets.HUB_DEPLOY_TOKEN }}
