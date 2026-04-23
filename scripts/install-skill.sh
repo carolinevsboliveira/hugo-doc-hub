@@ -37,8 +37,10 @@ echo "Instalando skill /doc-pr em $(pwd)..."
 
 mkdir -p .claude/commands
 
-gh api "repos/$DOCHUB_REPO/contents/templates/doc-pr.md" \
-    --jq '.content' | base64 -d > .claude/commands/doc-pr.md
+for skill in doc-pr doc-feature doc-module; do
+    gh api "repos/$DOCHUB_REPO/contents/templates/${skill}.md" \
+        --jq '.content' | base64 -d > ".claude/commands/${skill}.md"
+done
 
 cat > .dochubrc <<EOF
 DOCHUB_REPO=$DOCHUB_REPO
@@ -48,7 +50,10 @@ DOC_TYPES=$DOC_TYPES
 EOF
 
 echo ""
-echo "✓ Skill instalada em .claude/commands/doc-pr.md"
+echo "✓ Skills instaladas em .claude/commands/"
+echo "  - doc-pr.md"
+echo "  - doc-feature.md"
+echo "  - doc-module.md"
 echo "✓ Configuração salva em .dochubrc"
 echo ""
 echo "  DOCHUB_REPO = $DOCHUB_REPO"
@@ -56,5 +61,7 @@ echo "  TEAMS       = $TEAMS"
 echo "  PROJECT     = $PROJECT"
 echo "  DOC_TYPES   = $DOC_TYPES"
 echo ""
-echo "Use: /doc-pr 142"
-echo "     /doc-pr 142 --only technical"
+echo "Comandos disponíveis:"
+echo "  /doc-pr 142"
+echo "  /doc-feature pix-support --prs 138,141"
+echo "  /doc-module src/payments"
