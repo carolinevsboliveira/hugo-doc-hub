@@ -1,0 +1,32 @@
+baseURL = "https://docs.suaempresa.com"
+languageCode = "pt-br"
+title = "DocHub"
+theme = "dochub"
+enableRobotsTXT = true
+enableGitInfo = true
+
+[params]
+  org         = "Sua Empresa"
+  description = "Documentação centralizada de todos os times"
+  version     = "1.0.0"
+  github      = "https://github.com/your-org/docs-hub"
+
+[outputs]
+  home    = ["HTML", "RSS", "JSON"]
+  section = ["HTML", "RSS"]
+  page    = ["HTML"]
+
+[taxonomies]
+  team     = "teams"
+  doc_type = "doc_types"
+  project  = "projects"
+  tag      = "tags"
+
+[markup.goldmark.renderer]
+  unsafe = true
+
+[markup.highlight]
+  style      = "dracula"
+  lineNos    = false
+  codeFences = true
+  guessSyntax = true

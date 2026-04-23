@@ -1,0 +1,38 @@
+{{ define "main" }}
+<article class="doc">
+  <header class="doc-header">
+    <div class="doc-badges">
+      {{ with .Params.doc_type }}<span class="badge badge-{{ . }}">{{ . }}</span>{{ end }}
+      {{ with .Params.scope }}<span class="badge badge-scope">{{ . }}</span>{{ end }}
+      {{ with .Params.status }}<span class="badge badge-status">{{ . }}</span>{{ end }}
+    </div>
+    <h1>{{ .Title }}</h1>
+    <div class="doc-meta">
+      <span>{{ .Date.Format "02 Jan 2006" }}</span>
+      {{ with .Params.team }}<span>· {{ . }}</span>{{ end }}
+      {{ with .Params.project }}<span>· {{ . }}</span>{{ end }}
+      {{ with .Params.pr }}<span>· PR #{{ . }}</span>{{ end }}
+    </div>
+    {{ with .Params.tags }}
+    <div class="doc-tags">
+      {{ range . }}<span class="tag">{{ . }}</span>{{ end }}
+    </div>
+    {{ end }}
+  </header>
+
+  <div class="doc-toc">
+    <span class="toc-title">Nesta página</span>
+    {{ .TableOfContents }}
+  </div>
+
+  <div class="doc-content">
+    {{ .Content }}
+  </div>
+
+  <footer class="doc-footer">
+    <a href="{{ .Site.Params.github }}/blob/main/content{{ .File.Path }}" target="_blank">
+      Editar no GitHub ↗
+    </a>
+  </footer>
+</article>
+{{ end }}

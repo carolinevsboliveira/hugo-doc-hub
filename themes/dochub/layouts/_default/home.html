@@ -1,0 +1,43 @@
+{{ define "main" }}
+<div class="home">
+  <div class="home-hero">
+    <h1>Documentação <span class="accent">centralizada</span></h1>
+    <p>Base de conhecimento de todos os times — técnico, produto e FAQ em um só lugar.</p>
+  </div>
+
+  <div class="home-grid">
+    {{ $teams := .Site.GetPage "section" "teams" }}
+    {{ if $teams }}
+      {{ range $teams.Sections }}
+      <a class="team-card" href="{{ .RelPermalink }}">
+        <div class="team-card-header">
+          <span class="team-card-title">{{ .Title }}</span>
+          <span class="team-card-count">{{ len .Pages }} docs</span>
+        </div>
+        <div class="team-card-types">
+          {{ range .Sections }}
+          <span class="type-badge type-{{ .Title }}">{{ .Title }}</span>
+          {{ end }}
+        </div>
+      </a>
+      {{ end }}
+    {{ end }}
+  </div>
+
+  <div class="home-recent">
+    <h2>Atualizações recentes</h2>
+    <div class="doc-list">
+      {{ range first 10 (where .Site.RegularPages "Section" "ne" "") }}
+      <a class="doc-item" href="{{ .RelPermalink }}">
+        <div class="doc-item-meta">
+          <span class="badge badge-{{ .Params.doc_type }}">{{ .Params.doc_type }}</span>
+          <span class="doc-item-team">{{ .Params.team }}</span>
+        </div>
+        <span class="doc-item-title">{{ .Title }}</span>
+        <span class="doc-item-date">{{ .Date.Format "02 Jan 2006" }}</span>
+      </a>
+      {{ end }}
+    </div>
+  </div>
+</div>
+{{ end }}

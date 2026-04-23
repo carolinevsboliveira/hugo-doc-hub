@@ -1,0 +1,20 @@
+<header class="topbar">
+  <div class="topbar-left">
+    <a href="/" class="logo">
+      <span class="logo-icon">◈</span>
+      <span class="logo-text">{{ .Site.Title }}</span>
+    </a>
+  </div>
+  <div class="topbar-center">
+    <div class="search-wrap">
+      <input type="text" id="search-input" placeholder="Buscar documentação..." autocomplete="off">
+      <span class="search-icon">⌕</span>
+      <div id="search-results" class="search-results hidden"></div>
+    </div>
+  </div>
+  <div class="topbar-right">
+    {{ with .Site.Params.github }}
+    <a href="{{ . }}" class="topbar-link" target="_blank">GitHub</a>
+    {{ end }}
+  </div>
+</header>

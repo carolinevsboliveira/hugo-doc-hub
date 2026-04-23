@@ -1,0 +1,34 @@
+<nav class="sidebar">
+  <div class="sidebar-section">
+    <span class="sidebar-label">Times</span>
+    {{ $teams := .Site.GetPage "section" "teams" }}
+    {{ if $teams }}
+      {{ range $teams.Sections }}
+      <div class="sidebar-group {{ if hasPrefix $.RelPermalink .RelPermalink }}open{{ end }}">
+        <a class="sidebar-group-title" href="{{ .RelPermalink }}">
+          <span>{{ .Title }}</span>
+          <span class="chevron">›</span>
+        </a>
+        {{ if hasPrefix $.RelPermalink .RelPermalink }}
+        <div class="sidebar-group-items">
+          {{ range .Sections }}
+          <a class="sidebar-item {{ if eq $.RelPermalink .RelPermalink }}active{{ end }}"
+             href="{{ .RelPermalink }}">{{ .Title }}</a>
+          {{ end }}
+        </div>
+        {{ end }}
+      </div>
+      {{ end }}
+    {{ end }}
+  </div>
+
+  <div class="sidebar-section">
+    <span class="sidebar-label">Por Tipo</span>
+    <a class="sidebar-item {{ if in $.RelPermalink "technical" }}active{{ end }}"
+       href="/doc_types/technical/">⚙ Técnico</a>
+    <a class="sidebar-item {{ if in $.RelPermalink "product" }}active{{ end }}"
+       href="/doc_types/product/">📦 Produto</a>
+    <a class="sidebar-item {{ if in $.RelPermalink "faq" }}active{{ end }}"
+       href="/doc_types/faq/">❓ FAQ</a>
+  </div>
+</nav>
