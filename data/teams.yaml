@@ -1,9 +1,9 @@
 teams:
-  - id: team-payments
-    name: "Payments"
+  - id: go-learning
+    name: "Go"
     slack: "#team-payments"
     repos:
-      - payments-api
+      - go-learning
     doc_types: [technical, product, faq]
 
   - id: team-checkout
@@ -47,3 +47,17 @@ teams:
     repos:
       - frontend-app
     doc_types: [technical, product, faq]
+
+  - id: go-learnings
+    name: "Aprendizados de Go"
+    repos:
+      - LearnGo
+    doc_types: [technical]
+
+  - id: teste-script-novo
+    name: "teste"
+    doc_types: [technical]
+
+  - id: teste-1
+    name: "Teste run 1"
+    doc_types: [technical]
