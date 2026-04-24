@@ -1,0 +1,8 @@
+{{ if and .IsPage (gt (len (findRE "^#{1,6} " .RawContent)) 0) }}
+<aside class="sidebar-right">
+  <div class="toc-container">
+    <span class="toc-title">Nesta página</span>
+    {{ .TableOfContents }}
+  </div>
+</aside>
+{{ end }}
