@@ -10,7 +10,6 @@
     <main class="main">
       {{ block "main" . }}{{ end }}
     </main>
-    {{ partial "sidebar-right.html" . }}
   </div>
   {{ partial "footer.html" . }}
   {{- with resources.Get "js/main.js" }}
