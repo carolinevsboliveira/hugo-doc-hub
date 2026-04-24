@@ -5,30 +5,61 @@
     {{ with .Description }}<p class="page-desc">{{ . }}</p>{{ end }}
   </div>
 
-  {{ if .Sections }}
-  <div class="section-grid">
-    {{ range .Sections }}
-    <a class="section-card" href="{{ .RelPermalink }}">
-      <span class="section-card-title">{{ .Title }}</span>
-      <span class="section-card-count">{{ len .Pages }} docs</span>
-    </a>
-    {{ end }}
-  </div>
-  {{ end }}
+  {{/* ["", "teams", "sample"] = len 3 → página de time
+       ["", "teams", "sample", "technical"] = len 4 → página de tipo */}}
+  {{ $urlParts := split (strings.TrimSuffix "/" .RelPermalink) "/" }}
+  {{ $isTeamPage := eq (len $urlParts) 3 }}
 
-  {{ if .Pages }}
-  <div class="doc-list">
-    {{ range .Pages.ByDate.Reverse }}
-    <a class="doc-item" href="{{ .RelPermalink }}">
-      <div class="doc-item-meta">
-        <span class="badge badge-{{ .Params.doc_type }}">{{ .Params.doc_type }}</span>
-        {{ with .Params.scope }}<span class="badge badge-scope">{{ . }}</span>{{ end }}
-      </div>
-      <span class="doc-item-title">{{ .Title }}</span>
-      <span class="doc-item-date">{{ .Date.Format "02 Jan 2006" }}</span>
-    </a>
+  {{ if $isTeamPage }}
+
+    {{ if .Sections }}
+    <div class="section-grid">
+      {{ range .Sections }}
+      <a class="section-card" href="{{ .RelPermalink }}">
+        <span class="section-card-title">{{ .Title }}</span>
+        <span class="section-card-count">{{ len .Pages }} docs</span>
+      </a>
+      {{ end }}
+    </div>
     {{ end }}
-  </div>
+
+    {{ $teamId := index $urlParts 2 }}
+    {{ $docs := where .Site.RegularPages "Params.team" $teamId }}
+    {{ if $docs }}
+    <div class="team-recent">
+      <h2 class="team-recent-title">Últimas publicações</h2>
+      <div class="doc-list">
+        {{ range first 10 ($docs.ByDate.Reverse) }}
+        <a class="doc-item" href="{{ .RelPermalink }}">
+          <div class="doc-item-meta">
+            <span class="badge badge-{{ .Params.doc_type }}">{{ .Params.doc_type }}</span>
+            {{ with .Params.scope }}<span class="badge badge-scope">{{ . }}</span>{{ end }}
+          </div>
+          <span class="doc-item-title">{{ .Title }}</span>
+          <span class="doc-item-date">{{ .Date.Format "02 Jan 2006" }}</span>
+        </a>
+        {{ end }}
+      </div>
+    </div>
+    {{ end }}
+
+  {{ else }}
+
+    {{ if .Pages }}
+    <div class="doc-list">
+      {{ range .Pages.ByDate.Reverse }}
+      <a class="doc-item" href="{{ .RelPermalink }}">
+        <div class="doc-item-meta">
+          <span class="badge badge-{{ .Params.doc_type }}">{{ .Params.doc_type }}</span>
+          {{ with .Params.scope }}<span class="badge badge-scope">{{ . }}</span>{{ end }}
+        </div>
+        <span class="doc-item-title">{{ .Title }}</span>
+        <span class="doc-item-date">{{ .Date.Format "02 Jan 2006" }}</span>
+      </a>
+      {{ end }}
+    </div>
+    {{ end }}
+
   {{ end }}
 </div>
 {{ end }}

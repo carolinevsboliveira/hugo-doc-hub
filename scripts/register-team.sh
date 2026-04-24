@@ -164,7 +164,7 @@ date: ${TODAY}
 team: "${TEAM_ID}"
 project: "${TEAM_REPOS%,*}"
 doc_type: "${dt}"
-draft: true
+draft: false
 ---
 
 > Esta é uma página de exemplo gerada automaticamente. Substitua pelo conteúdo real.

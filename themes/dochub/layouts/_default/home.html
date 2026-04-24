@@ -25,19 +25,33 @@
   </div>
 
   <div class="home-recent">
-    <h2>Atualizações recentes</h2>
-    <div class="doc-list">
-      {{ range first 10 (where .Site.RegularPages "Section" "ne" "") }}
-      <a class="doc-item" href="{{ .RelPermalink }}">
-        <div class="doc-item-meta">
-          <span class="badge badge-{{ .Params.doc_type }}">{{ .Params.doc_type }}</span>
-          <span class="doc-item-team">{{ .Params.team }}</span>
+    <h2>Últimas documentações por time</h2>
+    {{ with .Site.Data.teams }}{{ with .teams }}
+      {{ range . }}
+      {{ $teamId := .id }}
+      {{ $teamName := .name }}
+      {{ $docs := where $.Site.RegularPages "Params.team" $teamId }}
+      {{ if $docs }}
+      <div class="recent-team-block">
+        <div class="recent-team-header">
+          <a class="recent-team-name" href="/teams/{{ $teamId }}/">{{ $teamName }}</a>
+          <span class="recent-team-count">{{ len $docs }} docs</span>
         </div>
-        <span class="doc-item-title">{{ .Title }}</span>
-        <span class="doc-item-date">{{ .Date.Format "02 Jan 2006" }}</span>
-      </a>
+        <div class="doc-list">
+          {{ range first 3 ($docs.ByDate.Reverse) }}
+          <a class="doc-item" href="{{ .RelPermalink }}">
+            <div class="doc-item-meta">
+              <span class="badge badge-{{ .Params.doc_type }}">{{ .Params.doc_type }}</span>
+            </div>
+            <span class="doc-item-title">{{ .Title }}</span>
+            <span class="doc-item-date">{{ .Date.Format "02 Jan 2006" }}</span>
+          </a>
+          {{ end }}
+        </div>
+      </div>
       {{ end }}
-    </div>
+      {{ end }}
+    {{ end }}{{ end }}
   </div>
 </div>
 {{ end }}

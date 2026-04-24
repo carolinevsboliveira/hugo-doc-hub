@@ -4,7 +4,7 @@ date: 2026-04-23
 team: "sample"
 project: ""
 doc_type: "technical"
-draft: true
+draft: false
 ---
 
 > Esta é uma página de exemplo gerada automaticamente. Substitua pelo conteúdo real.

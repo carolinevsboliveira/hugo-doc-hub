@@ -30,12 +30,10 @@
               <span>{{ $typeIcon }} {{ $typeLabel }}</span>
             </button>
             <div id="subgroup-{{ $teamId }}-{{ . }}" class="sidebar-subgroup-items">
-              {{ $teamPage := $.Site.GetPage (printf "sections" "teams" $teamId .) }}
-              {{ if $teamPage }}
-                {{ range $teamPage.RegularPages }}
+              {{ $docType := . }}
+              {{ range where (where $.Site.RegularPages "Params.team" $teamId) "Params.doc_type" $docType }}
                 <a class="sidebar-subitem {{ if eq $.RelPermalink .RelPermalink }}active{{ end }}"
                    href="{{ .RelPermalink }}">{{ .Title }}</a>
-                {{ end }}
               {{ end }}
             </div>
           </div>
@@ -47,13 +45,4 @@
     {{ end }}{{ end }}
   </div>
 
-  <div class="sidebar-section">
-    <span class="sidebar-label">Por Tipo</span>
-    <a class="sidebar-item {{ if in $.RelPermalink "technical" }}active{{ end }}"
-       href="/doc_types/technical/">⚙ Técnico</a>
-    <a class="sidebar-item {{ if in $.RelPermalink "product" }}active{{ end }}"
-       href="/doc_types/product/">📦 Produto</a>
-    <a class="sidebar-item {{ if in $.RelPermalink "faq" }}active{{ end }}"
-       href="/doc_types/faq/">❓ FAQ</a>
-  </div>
 </nav>

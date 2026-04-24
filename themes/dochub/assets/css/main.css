@@ -240,7 +240,14 @@ a:hover { text-decoration: underline; }
   background: var(--surface2); color: var(--muted);
 }
 
-.home-recent h2 { font-size: 1rem; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 16px; }
+.home-recent h2 { font-size: 1rem; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 24px; }
+.team-recent { margin-top: 40px; }
+.team-recent-title { font-size: 1rem; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 16px; }
+.recent-team-block { margin-bottom: 32px; }
+.recent-team-header { display: flex; align-items: baseline; gap: 10px; margin-bottom: 8px; }
+.recent-team-name { font-size: 0.95rem; font-weight: 600; color: var(--text); text-decoration: none; }
+.recent-team-name:hover { color: var(--accent); }
+.recent-team-count { font-size: 0.75rem; color: var(--muted); }
 
 /* ── Doc List ────────────────────────────────────────── */
 .doc-list { display: flex; flex-direction: column; gap: 2px; }
