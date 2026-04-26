@@ -9,21 +9,58 @@ Documentação centralizada de todos os times — técnico, produto e FAQ.
 - **GitHub Actions** — build e deploy automático
 - **Netlify** — hospedagem
 
+## Dependências
+
+### 🔴 Obrigatórias
+
+Para usar qualquer funcionalidade do DocHub, você precisa:
+
+| Ferramenta | Versão | Instalação |
+|-----------|--------|-----------|
+| **Hugo** | extended v0.120+ | [hugo.io](https://gohugo.io/installation/) |
+| **Python** | 3.8+ | [python.org](https://www.python.org/downloads/) |
+| **PyYAML** | - | `pip install pyyaml` |
+
+### 🟡 Obrigatórias (para usar skills do Claude)
+
+Para usar `/doc-pr`, `/doc-feature`, `/doc-module`:
+
+| Ferramenta | Versão | Instalação | Por quê |
+|-----------|--------|-----------|---------|
+| **ANTHROPIC_API_KEY** | - | [console.anthropic.com](https://console.anthropic.com/keys) | Necessário para chamar Claude API |
+
+### 🟢 Opcionais (mas recomendadas)
+
+| Ferramenta | Versão | Instalação | Por quê |
+|-----------|--------|-----------|---------|
+| **Git** | 2.0+ | [git-scm.com](https://git-scm.com/downloads) | Versionamento; necessário para `--pr` |
+| **GitHub CLI (gh)** | 2.0+ | [cli.github.com](https://cli.github.com/) | Abrir PRs automaticamente com `--pr` |
+
+**Resumo das dependencies:**
+- Sem Git/gh: Funciona tudo exceto abrir PRs (faça commit/push manualmente)
+- Sem ANTHROPIC_API_KEY: As skills e `generate-docs.py` não funcionam
+
+---
+
 ## Setup inicial
 
 ```bash
-# 1. Copiar .env.example para .env e atualizar valores
+# 1. Instalar dependências obrigatórias
+pip install pyyaml
+# E ter Hugo extended instalado
+
+# 2. Copiar .env.example para .env e atualizar valores
 cp .env.example .env
 # Edite .env com os dados da sua organização
 
-# 2. (Opcional) Configurar idiomas — ver seção de Internacionalização
+# 3. (Opcional) Configurar idiomas — ver seção de Internacionalização
 #    LANGUAGE_CODE="pt-br"
 #    SUPPORTED_LANGUAGES="pt-br,en-us"
 
-# 3. Rodar setup
+# 4. Rodar setup
 bash scripts/setup.sh
 
-# 4. Pronto! Rode localmente
+# 5. Pronto! Rode localmente
 hugo server --buildDrafts
 # Acesse: http://localhost:1313
 ```
@@ -291,26 +328,79 @@ draft: false
 
 **Nota:** O campo `language` é adicionado automaticamente pelos comandos Claude.
 
-## Dependências opcionais
+## Instalação de ferramentas
 
-| Ferramenta | Para quê | Obrigatório? |
-|-----------|----------|--------------|
-| **Git** | Versionamento e PRs | Opcional, mas recomendado |
-| **GitHub CLI (gh)** | Abrir PR automaticamente | Requerido se usar `--pr` |
-| **Hugo extended** | Build local com SCSS/SASS | Opcional (para desenvolvimento) |
-| **Python 3.8+** | Scripts de i18n e geração de docs | Opcional (se usar modo Python) |
-| **PyYAML** | Carregar traduções de i18n | Instalado automaticamente |
+### Instalar Python e dependências
 
-### Proteções automáticas:
+```bash
+# Verificar se Python 3.8+ está instalado
+python3 --version
 
-- ✅ **Sem Git**: Funcionalidades de PR não são oferecidas
-- ✅ **Git mas sem gh**: Mensagem clara com instruções para instalar
-- ✅ **Com ambos**: Tudo funciona normalmente
-- ✅ **i18n**: Funciona mesmo com um único idioma (sem configuração extra)
+# Instalar PyYAML (obrigatório)
+pip install pyyaml
+```
 
-Se não tiver `gh` instalado, você pode:
-1. Instalar: https://cli.github.com
-2. Ou fazer commit/push manualmente e abrir PR no GitHub
+### Instalar Hugo extended
+
+**macOS (Homebrew):**
+```bash
+brew install hugo
+```
+
+**Linux (Ubuntu/Debian):**
+```bash
+sudo apt-get install hugo
+```
+
+**Windows:**
+```bash
+choco install hugo-extended
+# Ou: scoop install hugo-extended
+```
+
+[Mais opções →](https://gohugo.io/installation/)
+
+### Instalar GitHub CLI (opcional, recomendado)
+
+Necessário apenas se usar `--pr` para abrir PRs automaticamente.
+
+```bash
+# macOS
+brew install gh
+
+# Linux
+curl -fsSL https://cli.github.com/packages/githubcli-archive-keyring.gpg | sudo dd of=/usr/share/keyrings/githubcli-archive-keyring.gpg
+echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/githubcli-archive-keyring.gpg] https://cli.github.com/packages stable main" | sudo tee /etc/apt/sources.list.d/github-cli.list > /dev/null
+sudo apt update
+sudo apt install gh
+
+# Windows
+choco install gh
+```
+
+[Mais opções →](https://cli.github.com/)
+
+### Configurar ANTHROPIC_API_KEY
+
+Necessário para usar as skills `/doc-pr`, `/doc-feature`, `/doc-module`:
+
+```bash
+# 1. Crie uma API key em https://console.anthropic.com/keys
+# 2. Configure no seu ambiente:
+export ANTHROPIC_API_KEY="sk-ant-..."
+
+# Ou adicione ao .env (se estiver usando dotenv):
+echo "ANTHROPIC_API_KEY=sk-ant-..." >> .env
+```
+
+### Proteções automáticas
+
+O DocHub detecta automaticamente quais ferramentas estão disponíveis:
+
+- ✅ **Sem Git**: Funcionalidades de versionamento não são oferecidas
+- ✅ **Git sem gh**: Mensagem clara com instruções para instalar
+- ✅ **Com ambos**: PRs abrem automaticamente com `--pr`
+- ✅ **Sem ANTHROPIC_API_KEY**: Skills do Claude desabilitadas com aviso claro
 
 ### Como usar os comandos em outros repositórios
 
