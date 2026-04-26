@@ -27,8 +27,53 @@ hugo server --buildDrafts
 ## Adicionar um novo time
 
 ```bash
+# Básico — apenas cria dados e conteúdo local
 bash scripts/register-team.sh --id team-xyz --name "Time XYZ" [--slack "#team-xyz"]
+
+# Com PR automático (requer Git)
+bash scripts/register-team.sh --id team-xyz --name "Time XYZ" --pr
+# Se Git não estiver disponível, a flag será ignorada com aviso
 ```
+
+**Parâmetros:**
+- `--id` *(obrigatório)* — identificador único (ex: `team-payments`)
+- `--name` *(obrigatório)* — nome de exibição (ex: `Payments`)
+- `--slack` *(opcional)* — canal Slack (ex: `#team-payments`)
+- `--repos` *(opcional)* — repositórios associados, separados por vírgula
+- `--doc-types` *(opcional)* — tipos de doc (padrão: `technical,product,faq`)
+- `--pr` *(opcional)* — abre PR automaticamente (requer Git e GitHub CLI)
+
+## Gerar documentação com Claude
+
+```bash
+# Gera docs (técnica, produto, FAQ) via Claude API
+python scripts/generate-docs.py \
+  --context context.json \
+  --doc-types "technical,product,faq" \
+  --project "api-payments" \
+  --team "team-payments" \
+  --output "content/teams/team-payments/docs"
+
+# Com PR automático (requer Git e GitHub CLI)
+python scripts/generate-docs.py \
+  --context context.json \
+  --doc-types "technical,product,faq" \
+  --project "api-payments" \
+  --team "team-payments" \
+  --output "content/teams/team-payments/docs" \
+  --pr
+```
+
+**Parâmetros:**
+- `--context` *(obrigatório)* — arquivo JSON com contexto do PR
+- `--doc-types` *(obrigatório)* — tipos a gerar (ex: `technical,product,faq`)
+- `--project` *(obrigatório)* — nome do projeto
+- `--team` *(obrigatório)* — ID do time
+- `--output` *(obrigatório)* — diretório de saída
+- `--pr` *(opcional)* — abre PR com docs geradas (requer Git e GitHub CLI)
+
+**Requer:**
+- `ANTHROPIC_API_KEY` — variável de ambiente com chave da API Claude
 
 ## Estrutura de conteúdo
 
@@ -54,6 +99,18 @@ scope: "pr | feature | module"
 draft: false
 ---
 ```
+
+## Dependências opcionais
+
+Estas ferramentas são **opcionais** e habilitam funcionalidades de automação:
+
+| Ferramenta | Funcionalidade | Comando |
+|-----------|---|---|
+| **Git** | Necessário para usar `--pr` em scripts | `git --version` |
+| **GitHub CLI** | Necessário para criar PR automaticamente | `gh --version` |
+| **Hugo extended** | Build local com SCSS/SASS | `hugo version` |
+
+Se Git não estiver disponível, a flag `--pr` será ignorada com um aviso e você precisará fazer commit/push manualmente.
 
 ## Deploy
 
