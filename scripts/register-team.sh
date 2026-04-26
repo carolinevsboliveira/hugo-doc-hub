@@ -46,7 +46,7 @@ TEAM_ID=""
 TEAM_NAME=""
 TEAM_SLACK=""
 TEAM_REPOS=""
-TEAM_DOC_TYPES="technical,product,faq"
+TEAM_DOC_TYPES="technical,product,faq,examples"
 OPEN_PR=false
 
 while [[ $# -gt 0 ]]; do
@@ -157,13 +157,27 @@ TEAM_EOF
 
         # Traduzir o título do doc_type
         dt_title=$(python3 "$(dirname "$0")/get-translation.py" --key "doc.${dt}" --lang "$lang")
-        cat > "content/${lang}/teams/${TEAM_ID}/$dt/_index.md" <<DOC_TYPE_EOF
+
+        # Preparar conteúdo do arquivo _index.md
+        if [[ "$dt" == "examples" ]]; then
+            section_description=$(python3 "$(dirname "$0")/get-translation.py" --key "register.examples_description" --lang "$lang")
+            cat > "content/${lang}/teams/${TEAM_ID}/$dt/_index.md" <<DOC_TYPE_EOF
+---
+title: "${dt_title}"
+team: "${TEAM_ID}"
+language: "${lang}"
+description: "${section_description}"
+---
+DOC_TYPE_EOF
+        else
+            cat > "content/${lang}/teams/${TEAM_ID}/$dt/_index.md" <<DOC_TYPE_EOF
 ---
 title: "${dt_title}"
 team: "${TEAM_ID}"
 language: "${lang}"
 ---
 DOC_TYPE_EOF
+        fi
     done
 done
 
