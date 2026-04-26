@@ -42,6 +42,8 @@ LANGUAGE_CODE="${LANGUAGE_CODE:-pt-br}"
 
 read -rp "Idiomas suportados (separados por vírgula) [pt-br,en-us]: " SUPPORTED_LANGUAGES
 SUPPORTED_LANGUAGES="${SUPPORTED_LANGUAGES:-pt-br,en-us}"
+# Remove spaces after commas for consistency
+SUPPORTED_LANGUAGES="${SUPPORTED_LANGUAGES// /}"
 
 read -rp "URL do repositório no GitHub (ex: https://github.com/acme/docs-hub) [Enter para pular]: " GITHUB_URL
 

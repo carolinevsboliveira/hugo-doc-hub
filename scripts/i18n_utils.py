@@ -13,7 +13,7 @@ import yaml
 def _load_env_file():
     """Load .env file if it exists and variables are not already set."""
     env_file = Path(".env")
-    if env_file.exists() and not os.environ.get("SUPPORTED_LANGUAGES"):
+    if env_file.exists():
         try:
             with open(env_file, "r", encoding="utf-8") as f:
                 for line in f:
@@ -21,8 +21,10 @@ def _load_env_file():
                     if line and not line.startswith("#") and "=" in line:
                         key, value = line.split("=", 1)
                         key = key.strip()
-                        value = value.strip().strip('"').strip("'")
-                        if key not in os.environ:
+                        # Remove quotes and spaces
+                        value = value.strip().strip('"').strip("'").strip()
+                        # Only set if not already in environment
+                        if key and value and key not in os.environ:
                             os.environ[key] = value
         except Exception as e:
             print(f"Warning: Could not load .env file: {e}")

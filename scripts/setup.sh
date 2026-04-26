@@ -36,6 +36,8 @@ else
 
     read -rp "Idiomas suportados (separados por vírgula) [pt-br,en-us]: " SUPPORTED_LANGUAGES
     SUPPORTED_LANGUAGES="${SUPPORTED_LANGUAGES:-pt-br,en-us}"
+    # Remove spaces after commas for consistency
+    SUPPORTED_LANGUAGES="${SUPPORTED_LANGUAGES// /}"
 
     read -rp "Nome da organização [Sua Empresa]: " ORG_NAME
     ORG_NAME="${ORG_NAME:-Sua Empresa}"
