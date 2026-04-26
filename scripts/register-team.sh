@@ -137,10 +137,12 @@ for lang in "${LANGS[@]}"; do
     mkdir -p "content/${lang}/teams/${TEAM_ID}"
 
     # Criar _index.md
+    DOC_DESC=$(python3 "$(dirname "$0")/get-translation.py" --key "register.doc_description" --lang "$lang")
+    DOC_DESC=$(printf "$DOC_DESC" "${TEAM_NAME}")
     cat > "content/${lang}/teams/${TEAM_ID}/_index.md" <<EOF
 ---
 title: "${TEAM_NAME}"
-description: "$(python3 "$(dirname "$0")/get-translation.py" --key "register.doc_description" --lang "$lang") ${TEAM_NAME}"
+description: "${DOC_DESC}"
 language: "${lang}"
 ---
 EOF
