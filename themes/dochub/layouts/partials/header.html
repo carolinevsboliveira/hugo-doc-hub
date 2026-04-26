@@ -13,6 +13,9 @@
     </div>
   </div>
   <div class="topbar-right">
+    {{ if gt (len .Site.Languages) 1 }}
+      {{ partial "language-switcher.html" . }}
+    {{ end }}
     {{ with .Site.Params.github }}
     <a href="{{ . }}" class="topbar-link" target="_blank">GitHub</a>
     {{ end }}

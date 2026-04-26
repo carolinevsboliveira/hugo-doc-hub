@@ -4,6 +4,8 @@ Generates technical, product, and/or FAQ documentation from a GitHub PR.
 
 Supports automatic generation in all languages configured via `SUPPORTED_LANGUAGES`.
 
+⚠️ **CRITICAL:** Generate documentation in **ALL supported languages**. Not doing so is a bug.
+
 ## Usage
 
 ```
@@ -67,21 +69,22 @@ If `--only` was passed, filter to only those types.
 
 ### 5. Generate files in multiple languages
 
-**For each supported language**, generate files:
+**For EACH supported language**, generate files for each doc_type:
 
 ```
 content/{lang}/teams/{team}/{doc_type}/pr-{number}-{slug}.md
 ```
 
-**Example:** PR #142 "Add PIX payment support" from team-payments in pt-br and en-us:
+**MANDATORY EXAMPLE:** PR #142 "Add PIX payment support" with SUPPORTED_LANGUAGES="pt-br,en-us":
 ```
-content/pt-br/teams/team-payments/technical/pr-142-add-pix-payment-support.md
-content/pt-br/teams/team-payments/product/pr-142-add-pix-payment-support.md
-content/en-us/teams/team-payments/technical/pr-142-add-pix-payment-support.md
-content/en-us/teams/team-payments/product/pr-142-add-pix-payment-support.md
+✓ content/pt-br/teams/team-payments/technical/pr-142-add-pix-payment-support.md
+✓ content/pt-br/teams/team-payments/product/pr-142-add-pix-payment-support.md
+✓ content/en-us/teams/team-payments/technical/pr-142-add-pix-payment-support.md
+✓ content/en-us/teams/team-payments/product/pr-142-add-pix-payment-support.md
 ```
 
-**IMPORTANT:** Each document type is generated in ALL specified languages. One Claude API call generates the content once, then it's included in all language versions.
+**CRITICAL:** Every language in SUPPORTED_LANGUAGES must get a file for each doc_type.
+The content is written once (in English), then translated/adapted for each language with proper frontmatter metadata.
 
 ### 6. Use translation for section titles and metadata
 
@@ -215,17 +218,33 @@ Install at https://cli.github.com
 
 ---
 
+## Validation Checklist (MANDATORY)
+
+Before completing, verify:
+
+- [ ] **Count languages:** How many languages in SUPPORTED_LANGUAGES? (e.g., 2 = pt-br, en-us)
+- [ ] **Count doc_types:** How many generate? (--only limits this)
+- [ ] **Files created:** Did I create **N × M files** (languages × doc_types)?
+  - For 2 languages + 2 doc_types (technical, product) = 4 files
+  - pt-br/technical, pt-br/product
+  - en-us/technical, en-us/product
+- [ ] **Paths correct:** Each file has language code in path (e.g., `content/{lang}/`)
+- [ ] **Frontmatter:** Each file has correct `language: "{lang}"` metadata
+- [ ] **No root-level files:** No files at `content/teams/{team}/{doc_type}/` (this is WRONG)
+
+If files < (languages × doc_types), **you have a bug**.
+
 ## Completion
 
 Show for each language:
 ```
 ✓ Documentation created in Portuguese (pt-br):
-  - content/pt-br/teams/{team}/technical/...
-  - content/pt-br/teams/{team}/product/...
+  - content/pt-br/teams/{team}/technical/pr-142-...md
+  - content/pt-br/teams/{team}/product/pr-142-...md
 
 ✓ Documentation created in English (en-us):
-  - content/en-us/teams/{team}/technical/...
-  - content/en-us/teams/{team}/product/...
+  - content/en-us/teams/{team}/technical/pr-142-...md
+  - content/en-us/teams/{team}/product/pr-142-...md
 ```
 
-If only one language: show only that one.
+**REQUIRED:** Show all files across all languages and doc_types. If you skip any, that's a bug.

@@ -17,11 +17,13 @@
           {{ if eq . "technical" }}{{ $typeIcon = "⚙" }}{{ end }}
           {{ if eq . "product" }}{{ $typeIcon = "📦" }}{{ end }}
           {{ if eq . "faq" }}{{ $typeIcon = "❓" }}{{ end }}
+          {{ if eq . "examples" }}{{ $typeIcon = "💡" }}{{ end }}
 
           {{ $typeLabel := . | title }}
           {{ if eq . "technical" }}{{ $typeLabel = "Técnico" }}{{ end }}
           {{ if eq . "product" }}{{ $typeLabel = "Produto" }}{{ end }}
           {{ if eq . "faq" }}{{ $typeLabel = "FAQ" }}{{ end }}
+          {{ if eq . "examples" }}{{ $typeLabel = "Exemplos" }}{{ end }}
           {{ if eq . "module" }}{{ $typeLabel = "Módulo" }}{{ end }}
 
           <div class="sidebar-subgroup">

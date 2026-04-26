@@ -23,6 +23,7 @@ search.results: "Resultados da busca"
 doc.technical: "Técnica"
 doc.product: "Produto"
 doc.faq: "FAQ"
+doc.examples: "Exemplos"
 doc.updated: "Atualizado em"
 doc.author: "Autor"
 
@@ -63,3 +64,4 @@ register.pr_help: "Para abrir um PR automaticamente, use: bash register-team.sh 
 register.pr_title: "feat: cadastra time %s"
 register.pr_body: "Cadastra o time `%s` no docs-hub.\n\n**Nome:** %s\n**Slack:** %s\n**Repos:** %s\n**Doc types:** %s"
 register.doc_description: "Documentação do time %s"
+register.examples_description: "Exemplos de código e casos de uso do time"

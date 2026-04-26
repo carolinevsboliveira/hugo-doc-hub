@@ -4,6 +4,14 @@
 
 set -e
 
+# Helper function to trim whitespace
+trim() {
+    local var="$1"
+    var="${var#"${var%%[![:space:]]*}"}"   # Remove leading whitespace
+    var="${var%"${var##*[![:space:]]}"}"   # Remove trailing whitespace
+    printf '%s' "$var"
+}
+
 # Parse environment variables
 LANGUAGE_CODE="${LANGUAGE_CODE:-pt-br}"
 SUPPORTED_LANGUAGES="${SUPPORTED_LANGUAGES:-pt-br}"
@@ -27,7 +35,8 @@ EOF
     local weight=2
     IFS=',' read -ra langs <<< "$supported_langs"
     for lang in "${langs[@]}"; do
-        lang=$(echo "$lang" | xargs) # trim whitespace
+        lang=$(trim "$lang")
+        [[ -z "$lang" ]] && continue
         if [[ "$lang" != "$primary_lang" ]]; then
             cat <<EOF
 [languages."${lang}"]

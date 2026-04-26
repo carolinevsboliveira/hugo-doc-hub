@@ -1,0 +1,77 @@
+{{ if gt (len .Site.Languages) 1 }}
+<div class="language-switcher">
+  <select class="language-select" onchange="changeLanguage(this.value)">
+    {{ range .Site.Languages }}
+      {{ $langPrefix := "" }}
+      {{ if ne .Lang .Site.DefaultLanguage }}
+        {{ $langPrefix = printf "/%s" .Lang }}
+      {{ end }}
+      {{ $currentPath := $.RelPermalink }}
+      {{ $isActive := eq $.Page.Language .Lang }}
+      <option value="{{ $langPrefix }}" {{ if $isActive }}selected{{ end }}>
+        {{ .LanguageName }} ({{ .Lang }})
+      </option>
+    {{ end }}
+  </select>
+</div>
+
+<script>
+function changeLanguage(newPath) {
+  // If newPath is empty, go to homepage
+  if (!newPath) {
+    window.location.href = '/';
+  } else {
+    // If we're on the homepage, just go to the language prefix
+    if (window.location.pathname === '/' || window.location.pathname === '') {
+      window.location.href = newPath + '/';
+    } else {
+      // Try to navigate to the same page in the new language
+      const currentPath = window.location.pathname.replace(/^\/[a-z]{2}(-[a-z]{2})?\//, '/');
+      const newFullPath = newPath + currentPath;
+
+      // Attempt navigation; fallback to language root if page doesn't exist
+      fetch(newFullPath, { method: 'HEAD' })
+        .then(response => {
+          if (response.ok) {
+            window.location.href = newFullPath;
+          } else {
+            window.location.href = newPath + '/';
+          }
+        })
+        .catch(() => {
+          window.location.href = newPath + '/';
+        });
+    }
+  }
+}
+</script>
+
+<style>
+.language-switcher {
+  display: flex;
+  align-items: center;
+}
+
+.language-select {
+  padding: 0.5rem 0.75rem;
+  border: 1px solid var(--color-border, #ccc);
+  border-radius: 4px;
+  background-color: var(--color-bg, #fff);
+  color: var(--color-text, #333);
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.language-select:hover {
+  border-color: var(--color-primary, #0066cc);
+  background-color: var(--color-bg-hover, #f5f5f5);
+}
+
+.language-select:focus {
+  outline: none;
+  border-color: var(--color-primary, #0066cc);
+  box-shadow: 0 0 0 2px rgba(0, 102, 204, 0.1);
+}
+</style>
+{{ end }}
