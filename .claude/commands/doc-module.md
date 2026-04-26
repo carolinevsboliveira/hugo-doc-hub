@@ -4,6 +4,8 @@ Documents a module or entire project folder. Ideal for onboarding, post-refactor
 
 Supports automatic generation in all languages configured via `SUPPORTED_LANGUAGES`.
 
+⚠️ **CRITICAL:** Generate documentation in **ALL supported languages**. Not doing so is a bug.
+
 ## Usage
 
 ```
@@ -51,21 +53,32 @@ Then explore the main files (entry points and tests).
 
 ### 3. Generate files in multiple languages
 
-Always **technical** type. For each supported language:
+Always **technical** type. **For EACH supported language**, create ONE file:
 
 ```
-content/{lang}/teams/{team}/technical/module-{name}-{slug}.md
+content/{lang}/teams/{team}/technical/module-{name}.md
 ```
 
 Where `{name}` is the last segment of the path (ex: `src/payments` → `payments`).
 
-**Example:** Module `src/payments` in pt-br and en-us:
+**MANDATORY EXAMPLE:** Module `src/payments` with SUPPORTED_LANGUAGES="pt-br,en-us":
 ```
-content/pt-br/teams/team-payments/technical/module-payments.md
-content/en-us/teams/team-payments/technical/module-payments.md
+✓ content/pt-br/teams/team-payments/technical/module-payments.md  (Portuguese)
+✓ content/en-us/teams/team-payments/technical/module-payments.md  (English)
 ```
 
-**IMPORTANT:** The module documentation is generated in ALL specified languages.
+❌ **WRONG:** Generate only in one language:
+```
+content/teams/go-learning/technical/module-introduction.md  ← MISSING LANGUAGE PATH
+```
+
+✓ **CORRECT:** Generate in each language:
+```
+content/pt-br/teams/go-learning/technical/module-introduction.md
+content/en-us/teams/go-learning/technical/module-introduction.md
+```
+
+**CRITICAL:** Do not skip this. Every language in SUPPORTED_LANGUAGES gets a file.
 
 ---
 
@@ -215,6 +228,21 @@ Install at https://cli.github.com
 
 ---
 
+## Validation Checklist (MANDATORY)
+
+Before completing, verify:
+
+- [ ] **Count languages:** How many languages in SUPPORTED_LANGUAGES? (e.g., 2 = pt-br, en-us)
+- [ ] **Files created:** Did I create **N files** (one per language)?
+  - `content/pt-br/teams/{team}/technical/module-{name}.md`
+  - `content/en-us/teams/{team}/technical/module-{name}.md`
+  - (... repeat for each language)
+- [ ] **Paths correct:** Each file has the language code in the path (e.g., `content/{lang}/`)
+- [ ] **Frontmatter:** Each file has correct `language: "{lang}"` metadata
+- [ ] **No root-level files:** No files at `content/teams/{team}/technical/` (this is WRONG)
+
+If you create fewer files than languages, **you have a bug**.
+
 ## Completion
 
 Show for each language:
@@ -226,4 +254,4 @@ Show for each language:
   - content/en-us/teams/{team}/technical/module-{name}.md
 ```
 
-If only one language: show only that one.
+**REQUIRED:** Show one line per language. If you skip a language, that's a bug.

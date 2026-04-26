@@ -4,6 +4,8 @@ Generates complete feature documentation — technical, product, and FAQ — fro
 
 Supports automatic generation in all languages configured via `SUPPORTED_LANGUAGES`.
 
+⚠️ **CRITICAL:** Generate documentation in **ALL supported languages**. Not doing so is a bug.
+
 ## Usage
 
 ```
@@ -73,7 +75,7 @@ find . -path ./node_modules -prune -o -name "*.test.*" -newer README.md -print |
 
 Always generates **technical** and **product**. Generates **faq** if it's in the team's `doc_types` in `data/teams.yaml`.
 
-**For each supported language:**
+**For EACH supported language**, create files for each doc type:
 
 ```
 content/{lang}/teams/{team}/technical/feature-{slug}.md
@@ -81,18 +83,19 @@ content/{lang}/teams/{team}/product/feature-{slug}.md
 content/{lang}/teams/{team}/faq/faq-{slug}.md        ← if faq is active
 ```
 
-**Example:** Feature "pix-support" in 2 languages:
+**MANDATORY EXAMPLE:** Feature "pix-support" with SUPPORTED_LANGUAGES="pt-br,en-us":
 ```
-content/pt-br/teams/team-payments/technical/feature-pix-support.md
-content/pt-br/teams/team-payments/product/feature-pix-support.md
-content/pt-br/teams/team-payments/faq/faq-pix-support.md
+✓ content/pt-br/teams/team-payments/technical/feature-pix-support.md
+✓ content/pt-br/teams/team-payments/product/feature-pix-support.md
+✓ content/pt-br/teams/team-payments/faq/faq-pix-support.md
 
-content/en-us/teams/team-payments/technical/feature-pix-support.md
-content/en-us/teams/team-payments/product/feature-pix-support.md
-content/en-us/teams/team-payments/faq/faq-pix-support.md
+✓ content/en-us/teams/team-payments/technical/feature-pix-support.md
+✓ content/en-us/teams/team-payments/product/feature-pix-support.md
+✓ content/en-us/teams/team-payments/faq/faq-pix-support.md
 ```
 
-**IMPORTANT:** Each document type is generated in ALL specified languages.
+**CRITICAL:** Every language in SUPPORTED_LANGUAGES must get a file for each doc_type.
+Do NOT create files without language prefix in the path.
 
 ---
 
@@ -210,17 +213,35 @@ Install at https://cli.github.com
 
 ---
 
+## Validation Checklist (MANDATORY)
+
+Before completing, verify:
+
+- [ ] **Count languages:** How many languages in SUPPORTED_LANGUAGES? (e.g., 2 = pt-br, en-us)
+- [ ] **Count doc_types:** How many in team's doc_types? (e.g., 3 = technical, product, faq)
+- [ ] **Files created:** Did I create **N × M files** (languages × doc_types)?
+  - For 2 languages + 3 doc_types = 6 files total
+  - pt-br/technical, pt-br/product, pt-br/faq
+  - en-us/technical, en-us/product, en-us/faq
+- [ ] **Paths correct:** Each file has language code in path (e.g., `content/{lang}/`)
+- [ ] **Frontmatter:** Each file has correct `language: "{lang}"` metadata
+- [ ] **No root-level files:** No files at `content/teams/{team}/{doc_type}/` (this is WRONG)
+
+If files < (languages × doc_types), **you have a bug**.
+
 ## Completion
 
-Show for each language:
+Show for each language and doc_type:
 ```
 ✓ Feature documentation created in Portuguese (pt-br):
   - content/pt-br/teams/{team}/technical/feature-{slug}.md
   - content/pt-br/teams/{team}/product/feature-{slug}.md
+  - content/pt-br/teams/{team}/faq/faq-{slug}.md
 
 ✓ Feature documentation created in English (en-us):
   - content/en-us/teams/{team}/technical/feature-{slug}.md
   - content/en-us/teams/{team}/product/feature-{slug}.md
+  - content/en-us/teams/{team}/faq/faq-{slug}.md
 ```
 
-If only one language: show only that one.
+**REQUIRED:** Show all files across all languages and doc_types. If you skip any, that's a bug.
