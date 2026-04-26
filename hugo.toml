@@ -19,8 +19,10 @@ defaultContentLanguageInSubdir = false
     
 # Language configuration (can be extended with additional languages)
 
-
-
+[languages."en-us"]
+  languageName = "English"
+  weight = 2
+  contentDir = "content/en-us"
 
 
 
