@@ -1,4 +1,0 @@
----
-title: "Product"
-team: "sample"
----
