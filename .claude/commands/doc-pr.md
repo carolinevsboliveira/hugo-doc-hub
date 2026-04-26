@@ -5,43 +5,41 @@ Gera documentação técnica, de produto e/ou FAQ a partir de um PR do GitHub.
 ## Uso
 
 ```
-/doc-pr [número] [--team <id>] [--project <nome>] [--only <tipos>]
+/doc-pr <número>
 ```
 
 **Exemplos:**
 ```
 /doc-pr 142
-/doc-pr 142 --only technical
-/doc-pr 142 --team team-checkout --project checkout-svc
 ```
+
+**Parâmetros opcionais:**
+- `--team <id>` — time (detecta automaticamente se não informado)
+- `--only <tipo>` — gera apenas um tipo (technical/product/faq, padrão: todos)
 
 ---
 
 ## O que fazer ao receber este comando
 
-### 1. Ler os parâmetros
+### 1. Validar parâmetros
 
-- `número` — obrigatório. Número do PR no GitHub.
-- `--team` — opcional. Default: leia de `data/teams.yaml` (primeiro time) ou pergunte ao usuário.
-- `--project` — opcional. Default: nome do diretório atual.
-- `--only` — opcional. Filtra os tipos: `technical`, `product`, `faq`. Default: todos os `doc_types` do time em `data/teams.yaml`.
+- `número` — obrigatório. Número do PR.
+- `--team` — se não informado: tenta detectar do primeiro time em `data/teams.yaml` ou **pergunta uma vez** ao usuário.
+- `--only` — se não informado: usa todos os `doc_types` do time.
 
-### 2. Coletar contexto do PR
+### 2. Coletar contexto do PR (simplificado)
 
-Execute na ordem, parando se um comando falhar:
-
+Se `gh` estiver disponível:
 ```bash
-gh pr view $NUMERO --json number,title,body,author,createdAt,mergedAt,additions,deletions,changedFiles,files
-gh pr diff $NUMERO | head -400
-gh pr view $NUMERO --json commits --jq '.commits[].messageHeadline'
+gh pr view $NUMERO --json number,title,body,changedFiles
+gh pr diff $NUMERO | head -300
 ```
 
-Se `gh` não estiver disponível:
-```bash
-git log main..HEAD --oneline
-git diff main...HEAD --stat
-git diff main...HEAD | head -400
-```
+Se não: **pergunta rápida**:
+- "Qual é o título do PR?"
+- "Qual é a descrição/mudanças principais?" (uma frase)
+
+(Contexto mínimo é suficiente — Claude completa as lacunas.)
 
 ### 3. Determinar os tipos a gerar
 
@@ -180,6 +178,19 @@ Inclua perguntas sobre casos de borda e erros comuns visíveis no diff.]
 
 ---
 
+## Dependências
+
+- **Git** — para oferecer opção de PR (obrigatório)
+- **GitHub CLI (gh)** — para abrir PR automaticamente (obrigatório se usar PR)
+
+Se `gh` não estiver instalado mas o usuário escolher PR, mostre:
+```
+❌ Erro: --pr requer GitHub CLI (gh) instalado
+Instale em https://cli.github.com
+```
+
+---
+
 ## Ao finalizar
 
-Liste os arquivos criados com seus caminhos relativos e confirme ao usuário.
+Mostre: ✓ Documentação criada em `content/teams/{team}/...`

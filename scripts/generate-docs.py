@@ -5,6 +5,7 @@ import anthropic
 import json
 import os
 import argparse
+import subprocess
 from pathlib import Path
 from datetime import datetime
 
@@ -133,6 +134,61 @@ def build_frontmatter(doc_type: str, project: str, team: str, context: dict) -> 
     )
 
 
+def is_git_available() -> bool:
+    """Verifica se Git está disponível no sistema."""
+    try:
+        subprocess.run(["git", "--version"], capture_output=True, check=True)
+        return True
+    except (FileNotFoundError, subprocess.CalledProcessError):
+        return False
+
+
+def is_gh_available() -> bool:
+    """Verifica se GitHub CLI está disponível no sistema."""
+    try:
+        subprocess.run(["gh", "--version"], capture_output=True, check=True)
+        return True
+    except (FileNotFoundError, subprocess.CalledProcessError):
+        return False
+
+
+def open_pr(context: dict, output_dir: Path, project: str, team: str) -> None:
+    """Abre um PR com a documentação gerada (Git e gh já validados upfront)."""
+    pr_number = context.get("pr_number", "push")
+    pr_title = context.get("pr_title", f"docs: {project}")
+
+    branch = f"docs/{project}/{pr_number}".replace("/push", f"/{int(datetime.now().timestamp())}")
+
+    try:
+        subprocess.run(["git", "fetch", "origin", "--quiet"], check=True)
+        subprocess.run(["git", "checkout", "main", "--quiet"], check=True)
+        subprocess.run(["git", "reset", "--hard", "origin/main", "--quiet"], check=True)
+        subprocess.run(["git", "branch", "-D", branch], stderr=subprocess.DEVNULL)
+        subprocess.run(["git", "checkout", "-b", branch], check=True)
+
+        subprocess.run(["git", "config", "user.name", "DocHub Bot"], check=True)
+        subprocess.run(["git", "config", "user.email", "dochub-bot@noreply.github.com"], check=True)
+
+        subprocess.run(["git", "add", str(output_dir)], check=True)
+        subprocess.run(["git", "commit", "-m", f"docs: {project} — {pr_title}"], check=True)
+
+        # Abre PR com GitHub CLI (já validado upfront)
+        result = subprocess.run(
+            ["gh", "pr", "create",
+             "--head", branch,
+             "--base", "main",
+             "--title", f"docs: {pr_title}",
+             "--body", f"Documentação automática gerada para {project}\n\nTimes: {team}"],
+            capture_output=True,
+            text=True,
+            check=True
+        )
+        print(f"✓ PR aberto: {result.stdout.strip()}")
+    except subprocess.CalledProcessError as e:
+        print(f"✗ Erro ao abrir PR: {e}")
+        raise
+
+
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--context", required=True)
@@ -140,7 +196,21 @@ def main():
     parser.add_argument("--project", required=True)
     parser.add_argument("--team", required=True)
     parser.add_argument("--output", required=True)
+    parser.add_argument("--pr", action="store_true", help="Abrir PR com a documentação gerada")
     args = parser.parse_args()
+
+    # Valida --pr cedo, antes de gerar docs
+    if args.pr:
+        if not is_git_available():
+            print("❌ Erro: --pr requer Git instalado")
+            exit(1)
+        if not is_gh_available():
+            print("❌ Erro: --pr requer GitHub CLI (gh) instalado")
+            print()
+            print("Instale em https://cli.github.com ou execute sem --pr:")
+            print("  python scripts/generate-docs.py ... (sem --pr)")
+            print("  Depois faça commit e push manualmente")
+            exit(1)
 
     with open(args.context) as f:
         context = json.load(f)
@@ -168,6 +238,10 @@ def main():
             f.write(frontmatter + content)
 
         print(f"  ✓ {filepath}")
+
+    # Abre PR se solicitado e git está disponível
+    if args.pr:
+        open_pr(context, output_dir, args.project, args.team)
 
 
 if __name__ == "__main__":

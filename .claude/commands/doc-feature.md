@@ -5,26 +5,28 @@ Gera documentação completa de uma feature — técnica, produto e FAQ — a pa
 ## Uso
 
 ```
-/doc-feature [nome-da-feature] [--team <id>] [--project <nome>] [--prs <n1,n2>] [--branch <nome>]
+/doc-feature <nome-da-feature>
 ```
 
 **Exemplos:**
 ```
 /doc-feature pix-support
-/doc-feature sso-auth --prs 138,141,145
-/doc-feature new-checkout --branch feature/checkout-v2
-/doc-feature pix-support --team team-payments --project payments-api
+/doc-feature sso-auth
 ```
+
+**Parâmetros opcionais:**
+- `--prs <n1,n2,n3>` — números de PRs específicos
+- `--branch <nome>` — ou use uma branch em vez de PRs
+- `--team <id>` — time (detecta automaticamente se não informado)
 
 ---
 
 ## O que fazer ao receber este comando
 
-### 1. Perguntar ao usuário (antes de qualquer comando)
+### 1. Uma pergunta só
 
-Se não informado, pergunte:
-1. Quais PRs fazem parte desta feature? (ou branch, ou período)
-2. Existe um ticket/epic de referência?
+Se não informado `--prs` ou `--branch`: **pergunta uma vez apenas**:
+- "Quais PRs? (ex: 138,141,145) Ou deixe em branco para usar a branch atual."
 
 ### 2. Coletar contexto
 
@@ -177,6 +179,19 @@ Inclua perguntas sobre casos de borda, erros comuns e migração.]
 
 ---
 
+## Dependências
+
+- **Git** — para oferecer opção de PR (obrigatório)
+- **GitHub CLI (gh)** — para abrir PR automaticamente (obrigatório se usar PR)
+
+Se `gh` não estiver instalado mas o usuário escolher PR, mostre:
+```
+❌ Erro: --pr requer GitHub CLI (gh) instalado
+Instale em https://cli.github.com
+```
+
+---
+
 ## Ao finalizar
 
-Liste os arquivos criados com seus caminhos relativos e confirme ao usuário.
+Mostre: ✓ Docs da feature criadas em `content/teams/{team}/...`
