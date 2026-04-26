@@ -73,7 +73,18 @@ gh pr diff $NUMERO | head -400
 gh pr view $NUMERO --json commits --jq '.commits[].messageHeadline'
 ```
 
-### 5. Gerar os arquivos de documentação
+### 5. Carregar configuração de idiomas
+
+**CRITICAL:** Gere documentação em **TODOS os idiomas** configurados.
+
+```python
+from scripts.i18n_utils import load_i18n
+
+i18n = load_i18n()
+supported_langs = i18n.get_supported_languages()  # ["pt-br", "en-us"]
+```
+
+### 6. Gerar os arquivos de documentação em múltiplos idiomas
 
 Determine os tipos a gerar: use `DOC_TYPES` do `.dochubrc` (ou `--only` se passado).
 
@@ -81,17 +92,42 @@ Se `faq` estiver nos tipos, pergunte antes de gerar:
 
 > Deseja gerar também o FAQ? (sim/não)
 
-Se a resposta for não, remova `faq` da lista.
+**Para CADA idioma em `supported_langs`** e **para CADA doc_type**, crie:
 
-Determine o caminho de destino dos arquivos:
-- Se `DOCHUB_PATH` estiver definido: salve em `$DOCHUB_PATH/content/teams/$TEAM/{doc_type}/pr-{número}-{slug}.md`
-- Caso contrário: salve em `/tmp/dochub-docs-{número}/{doc_type}/pr-{número}-{slug}.md`
+```
+content/{lang}/teams/{team}/{doc_type}/pr-{número}-{slug}.md
+```
+
+**EXEMPLO:** PR #142 com SUPPORTED_LANGUAGES="pt-br,en-us":
+```
+✓ content/pt-br/teams/team-payments/technical/pr-142-add-pix-support.md
+✓ content/pt-br/teams/team-payments/product/pr-142-add-pix-support.md
+✓ content/en-us/teams/team-payments/technical/pr-142-add-pix-support.md
+✓ content/en-us/teams/team-payments/product/pr-142-add-pix-support.md
+```
+
+❌ **ERRADO:** Criar sem idioma:
+```
+content/teams/team-payments/technical/pr-142-add-pix-support.md  ← FALTA IDIOMA
+```
 
 Onde `{slug}` = título do PR em kebab-case, máximo 50 chars.
+⚠️ **CRITICAL:** Cada arquivo deve ter `language: "{lang}"` no frontmatter.
 
-### 6. Confirmar antes de abrir o PR
+### 7. Confirmar antes de abrir o PR
 
-Exiba os caminhos dos arquivos gerados e uma prévia de cada um (título e primeiras seções).
+Exiba os caminhos dos arquivos gerados **para CADA idioma e doc_type** e uma prévia de cada um (título e primeiras seções).
+
+**Exemplo de output:**
+```
+✓ Documentation in Portuguese (pt-br):
+  - content/pt-br/teams/team-payments/technical/pr-142-add-pix-support.md
+  - content/pt-br/teams/team-payments/product/pr-142-add-pix-support.md
+
+✓ Documentation in English (en-us):
+  - content/en-us/teams/team-payments/technical/pr-142-add-pix-support.md
+  - content/en-us/teams/team-payments/product/pr-142-add-pix-support.md
+```
 
 Em seguida, pergunte (padrão **não**):
 

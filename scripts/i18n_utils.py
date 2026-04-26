@@ -10,14 +10,39 @@ from typing import Dict, Optional
 import yaml
 
 
+def _load_env_file():
+    """Load .env file if it exists and variables are not already set."""
+    env_file = Path(".env")
+    if env_file.exists():
+        try:
+            with open(env_file, "r", encoding="utf-8") as f:
+                for line in f:
+                    line = line.strip()
+                    if line and not line.startswith("#") and "=" in line:
+                        key, value = line.split("=", 1)
+                        key = key.strip()
+                        # Remove quotes and spaces
+                        value = value.strip().strip('"').strip("'").strip()
+                        # Only set if not already in environment
+                        if key and value and key not in os.environ:
+                            os.environ[key] = value
+        except Exception as e:
+            print(f"Warning: Could not load .env file: {e}")
+
+
 class I18n:
     """Handle internationalization for DocHub."""
 
     def __init__(self):
+        # Try to load .env if not already loaded
+        _load_env_file()
+
         self.primary_language = os.environ.get("LANGUAGE_CODE", "pt-br").lower()
+        # Default to pt-br,en-us if SUPPORTED_LANGUAGES is not set
+        default_langs = "pt-br,en-us"
         self.supported_languages = [
             lang.strip()
-            for lang in os.environ.get("SUPPORTED_LANGUAGES", self.primary_language).split(",")
+            for lang in os.environ.get("SUPPORTED_LANGUAGES", default_langs).split(",")
         ]
         self.translations: Dict[str, Dict[str, str]] = {}
         self._load_translations()
