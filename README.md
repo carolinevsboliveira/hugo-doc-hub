@@ -45,29 +45,27 @@ bash scripts/register-team.sh --id team-xyz --name "Time XYZ" --pr
 
 ## Gerar documentação com Claude
 
-### ✨ Modo simplificado (recomendado)
+### ✨ Modo simplificado (recomendado) — Skills
+
+Use as skills integradas no Claude Code:
 
 ```bash
-bash scripts/generate-docs-interactive.sh
+/doc-pr 142              # Documentação de um PR
+/doc-feature pix-support # Documentação de uma feature
+/doc-module src/payments # Documentação de um módulo
 ```
 
-O script faz perguntas interativas e:
-- ✅ Detecta projeto automaticamente
-- ✅ Coleta contexto de forma amigável
-- ✅ Simplifica o JSON
-- ✅ Oferece abrir PR automaticamente
+As skills:
+- ✅ Detectam projeto/time automaticamente
+- ✅ Fazem perguntas apenas quando necessário
+- ✅ Geram documentação técnica, produto e FAQ
+- ✅ Oferecem abrir PR automaticamente
 
-### Modo avançado (linha de comando)
+### Modo avançado (Python direto)
+
+Para uso programático ou CI/CD:
 
 ```bash
-python scripts/generate-docs.py \
-  --context context.json \
-  --doc-types "technical,product,faq" \
-  --project "api-payments" \
-  --team "team-payments" \
-  --output "content/teams/team-payments/docs"
-
-# Com PR automático (requer Git e GitHub CLI)
 python scripts/generate-docs.py \
   --context context.json \
   --doc-types "technical,product,faq" \
@@ -77,31 +75,28 @@ python scripts/generate-docs.py \
   --pr
 ```
 
-**Formato do contexto (JSON simplificado):**
-
-Ver exemplo em `scripts/context-example.json`:
+**Contexto JSON:**
 ```json
 {
   "pr_number": "123",
-  "pr_title": "Titulo da mudança",
-  "pr_body": "Descrição detalhada",
-  "changed_files": ["src/file1.ts", "src/file2.ts"],
-  "diff_summary": "Resumo das mudanças",
-  "readme": "README atual do projeto (opcional)",
-  "tags": ["tag1", "tag2"]
+  "pr_title": "Titulo",
+  "pr_body": "Descrição",
+  "changed_files": ["src/file.ts"],
+  "diff_summary": "Resumo",
+  "readme": "README (opcional)",
+  "tags": []
 }
 ```
 
 **Parâmetros:**
-- `--context` *(obrigatório)* — arquivo JSON com contexto
-- `--doc-types` *(obrigatório)* — tipos a gerar (ex: `technical,product,faq`)
-- `--project` *(obrigatório)* — nome do projeto
-- `--team` *(obrigatório)* — ID do time
-- `--output` *(obrigatório)* — diretório de saída
-- `--pr` *(opcional)* — abre PR com docs geradas (requer Git e GitHub CLI)
+- `--context` — arquivo JSON
+- `--doc-types` — tipos (ex: `technical,product,faq`)
+- `--project` — nome do projeto
+- `--team` — ID do time
+- `--output` — diretório de saída
+- `--pr` *(opcional)* — abre PR (requer Git e GitHub CLI)
 
-**Requer:**
-- `ANTHROPIC_API_KEY` — variável de ambiente com chave da API Claude
+**Requer:** `ANTHROPIC_API_KEY`
 
 ## Estrutura de conteúdo
 
