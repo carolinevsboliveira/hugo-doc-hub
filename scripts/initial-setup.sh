@@ -37,17 +37,27 @@ BASE_URL="${BASE_URL:-http://localhost:1313}"
 read -rp "Título do site [DocHub]: " SITE_TITLE
 SITE_TITLE="${SITE_TITLE:-DocHub}"
 
+read -rp "Idioma principal (pt-br/en-us/outro) [pt-br]: " LANGUAGE_CODE
+LANGUAGE_CODE="${LANGUAGE_CODE:-pt-br}"
+
+read -rp "Idiomas suportados (separados por vírgula) [pt-br,en-us]: " SUPPORTED_LANGUAGES
+SUPPORTED_LANGUAGES="${SUPPORTED_LANGUAGES:-pt-br,en-us}"
+
 read -rp "URL do repositório no GitHub (ex: https://github.com/acme/docs-hub) [Enter para pular]: " GITHUB_URL
 
-# --- 2. Atualiza hugo.toml ---
+# --- 2. Configura internacionalização ---
 
 echo ""
-echo "→ Atualizando hugo.toml..."
+echo "→ Configurando idiomas..."
+
+export LANGUAGE_CODE="$LANGUAGE_CODE"
+export SUPPORTED_LANGUAGES="$SUPPORTED_LANGUAGES"
 
 # Usa sed para substituir os campos inline
 sed -i '' \
     "s|^baseURL = .*|baseURL = \"${BASE_URL}\"|" \
     "s|^title = .*|title = \"${SITE_TITLE}\"|" \
+    "s|^languageCode = .*|languageCode = \"${LANGUAGE_CODE}\"|" \
     hugo.toml
 
 # Atualiza params.org e params.description
@@ -59,6 +69,18 @@ sed -i '' \
 if [[ -n "$GITHUB_URL" ]]; then
     sed -i '' "s|github.*=.*\".*\"|github      = \"${GITHUB_URL}\"|" hugo.toml
 fi
+
+# Atualiza configuração de i18n
+python3 scripts/manage-i18n.py
+
+# Cria diretórios de conteúdo para cada idioma
+IFS=',' read -ra langs <<< "$SUPPORTED_LANGUAGES"
+for lang in "${langs[@]}"; do
+    lang="${lang// /}"  # Remove espaços
+    [[ -z "$lang" ]] && continue
+    mkdir -p "content/$lang/teams"
+    echo "  ✓ Diretório criado: content/$lang"
+done
 
 # --- 3. Remove conteúdo de exemplo ---
 

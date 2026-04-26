@@ -22,19 +22,39 @@ if [[ ! -f "hugo.toml" || ! -d "content" || ! -d "data" ]]; then
     exit 1
 fi
 
-# Carrega .env se existir, senão usa defaults
+# Carrega .env se existir, senão pergunta ao usuário
 if [[ -f ".env" ]]; then
     set -a
     source .env
     set +a
     echo "✓ Configurações carregadas de .env"
 else
-    echo "⚠ Arquivo .env não encontrado. Usando defaults..."
-    ORG_NAME="${ORG_NAME:-Sua Empresa}"
-    SITE_TITLE="${SITE_TITLE:-DocHub}"
-    BASE_URL="${BASE_URL:-http://localhost:1313}"
+    echo "⚠ Arquivo .env não encontrado. Configure os idiomas:"
+    echo ""
+    read -rp "Idioma principal (pt-br/en-us/outro) [pt-br]: " LANGUAGE_CODE
     LANGUAGE_CODE="${LANGUAGE_CODE:-pt-br}"
-    SUPPORTED_LANGUAGES="${SUPPORTED_LANGUAGES:-pt-br}"
+
+    read -rp "Idiomas suportados (separados por vírgula) [pt-br,en-us]: " SUPPORTED_LANGUAGES
+    SUPPORTED_LANGUAGES="${SUPPORTED_LANGUAGES:-pt-br,en-us}"
+
+    read -rp "Nome da organização [Sua Empresa]: " ORG_NAME
+    ORG_NAME="${ORG_NAME:-Sua Empresa}"
+
+    read -rp "Título do site [DocHub]: " SITE_TITLE
+    SITE_TITLE="${SITE_TITLE:-DocHub}"
+
+    read -rp "URL base [http://localhost:1313]: " BASE_URL
+    BASE_URL="${BASE_URL:-http://localhost:1313}"
+
+    # Salva em .env para próximas execuções
+    cat > .env <<EOF
+ORG_NAME="$ORG_NAME"
+SITE_TITLE="$SITE_TITLE"
+BASE_URL="$BASE_URL"
+LANGUAGE_CODE="$LANGUAGE_CODE"
+SUPPORTED_LANGUAGES="$SUPPORTED_LANGUAGES"
+EOF
+    echo "✓ Configurações salvas em .env"
 fi
 
 echo ""
