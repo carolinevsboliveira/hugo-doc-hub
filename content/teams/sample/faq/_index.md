@@ -1,4 +1,0 @@
----
-title: "Faq"
-team: "sample"
----

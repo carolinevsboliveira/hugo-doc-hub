@@ -1,5 +1,1 @@
-teams:
-
-  - id: sample
-    name: "Sample"
-    doc_types: [technical, product, faq]
+teams: []

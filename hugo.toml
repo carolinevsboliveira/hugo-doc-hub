@@ -1,4 +1,4 @@
-baseURL = "https://docs.suaempresa.com"
+baseURL = "http://localhost:1313"
 languageCode = "pt-br"
 title = "DocHub"
 theme = "dochub"
@@ -11,7 +11,7 @@ defaultContentLanguageInSubdir = false
 
 [params]
   org         = "Sua Empresa"
-  description = "Documentação centralizada de todos os times"
+  description = "Documentação centralizada de todos os times de Sua Empresa"
   version     = "1.0.0"
   github      = "https://github.com/your-org/docs-hub"
 
@@ -22,16 +22,13 @@ defaultContentLanguageInSubdir = false
 
 
 
+
+
+
 [languages."pt-br"]
   languageName = "Português (Brasil)"
   weight = 1
   contentDir = "content/pt-br"
-
-
-[languages."en-us"]
-  languageName = "English (US)"
-  weight = 2
-  contentDir = "content/en-us"
 
 [outputs]
   home    = ["HTML", "RSS", "JSON"]
