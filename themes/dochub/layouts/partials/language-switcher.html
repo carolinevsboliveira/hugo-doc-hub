@@ -40,41 +40,60 @@
 function toggleLanguageMenu(event) {
   event.stopPropagation();
   const menu = document.getElementById('languageMenu');
-  menu.classList.toggle('active');
+  const isActive = menu.classList.contains('active');
+
+  if (!isActive) {
+    closeAllLanguageMenus();
+    menu.classList.add('active');
+  } else {
+    menu.classList.remove('active');
+  }
+}
+
+function closeAllLanguageMenus() {
+  const menus = document.querySelectorAll('.language-menu.active');
+  menus.forEach(menu => menu.classList.remove('active'));
 }
 
 function changeLanguage(newPath) {
   const menu = document.getElementById('languageMenu');
   menu.classList.remove('active');
 
-  if (!newPath) {
-    window.location.href = '/';
-  } else {
-    if (window.location.pathname === '/' || window.location.pathname === '') {
-      window.location.href = newPath + '/';
+  setTimeout(() => {
+    if (!newPath) {
+      window.location.href = '/';
     } else {
-      const currentPath = window.location.pathname.replace(/^\/[a-z]{2}(-[a-z]{2})?\//, '/');
-      const newFullPath = newPath + currentPath;
-      fetch(newFullPath, { method: 'HEAD' })
-        .then(response => {
-          if (response.ok) {
-            window.location.href = newFullPath;
-          } else {
+      if (window.location.pathname === '/' || window.location.pathname === '') {
+        window.location.href = newPath + '/';
+      } else {
+        const currentPath = window.location.pathname.replace(/^\/[a-z]{2}(-[a-z]{2})?\//, '/');
+        const newFullPath = newPath + currentPath;
+        fetch(newFullPath, { method: 'HEAD' })
+          .then(response => {
+            if (response.ok) {
+              window.location.href = newFullPath;
+            } else {
+              window.location.href = newPath + '/';
+            }
+          })
+          .catch(() => {
             window.location.href = newPath + '/';
-          }
-        })
-        .catch(() => {
-          window.location.href = newPath + '/';
-        });
+          });
+      }
     }
-  }
+  }, 150);
 }
 
 document.addEventListener('click', function(event) {
   const container = document.querySelector('.language-switcher-container');
-  const menu = document.getElementById('languageMenu');
   if (container && !container.contains(event.target)) {
-    menu.classList.remove('active');
+    closeAllLanguageMenus();
+  }
+});
+
+document.addEventListener('keydown', function(event) {
+  if (event.key === 'Escape') {
+    closeAllLanguageMenus();
   }
 });
 </script>
@@ -129,16 +148,19 @@ document.addEventListener('click', function(event) {
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
   opacity: 0;
   visibility: hidden;
-  transform: translateY(-8px);
-  transition: all 0.2s ease;
+  transform: translateY(-8px) scale(0.95);
+  transition: opacity 0.2s ease, visibility 0.2s ease, transform 0.2s ease;
   z-index: 1000;
   overflow: hidden;
+  backface-visibility: hidden;
+  perspective: 1000px;
+  will-change: transform, opacity, visibility;
 }
 
 .language-menu.active {
   opacity: 1;
   visibility: visible;
-  transform: translateY(0);
+  transform: translateY(0) scale(1);
 }
 
 .language-option {
