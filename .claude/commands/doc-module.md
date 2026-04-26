@@ -5,40 +5,30 @@ Documenta um módulo ou pasta inteira do projeto. Ideal para onboarding, pós-re
 ## Uso
 
 ```
-/doc-module [caminho] [--team <id>] [--project <nome>]
+/doc-module <caminho>
 ```
 
 **Exemplos:**
 ```
 /doc-module src/payments
-/doc-module src/services/webhook
 /doc-module .
 ```
+
+**Parâmetros opcionais:**
+- `--team <id>` — time (detecta automaticamente se não informado)
 
 ---
 
 ## O que fazer ao receber este comando
 
-### 1. Ler os arquivos do módulo
+### 1. Explorar o módulo (mínimo essencial)
 
-Nunca documente o que não leu. Execute na ordem:
-
+Leia:
 ```bash
-# Estrutura do módulo
-find {caminho} -type f | grep -v node_modules | grep -v ".git" | grep -v "__pycache__" | sort
-
-# Histórico recente
-git log --oneline --since="90 days ago" -- {caminho} | head -30
-
-# Principais contribuidores
-git shortlog --summary --since="180 days ago" -- {caminho}
+find {caminho} -type f \( -name "*.ts" -o -name "*.js" -o -name "*.py" -o -name "*.go" \) | head -20
 ```
 
-Depois leia os arquivos priorizando:
-1. Entry points: `index.ts`, `index.py`, `main.go`, `__init__.py`
-2. Arquivos com mais imports
-3. Arquivos de configuração
-4. Arquivos de teste (revelam comportamento esperado)
+Depois explore os principais arquivos (entry points e testes).
 
 ### 2. Gerar o arquivo
 
@@ -120,4 +110,4 @@ draft: false
 
 ## Ao finalizar
 
-Liste o arquivo criado com seu caminho relativo e confirme ao usuário.
+Mostre: ✓ Módulo documentado em `content/teams/{team}/technical/module-{nome}.md`
