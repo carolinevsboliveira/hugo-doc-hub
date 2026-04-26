@@ -4,6 +4,13 @@
 
 set -e
 
+# Carrega .env se existir
+if [[ -f ".env" ]]; then
+    set -a
+    source .env
+    set +a
+fi
+
 # Helper function to trim whitespace
 trim() {
     local var="$1"
