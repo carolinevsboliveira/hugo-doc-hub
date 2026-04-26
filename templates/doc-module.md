@@ -75,24 +75,57 @@ Se não autenticado, oriente o usuário a rodar `gh auth login` e interrompa.
 
 Se `USE_GITHUB=false`, pule esta etapa.
 
-### 5. Gerar os arquivos
+### 5. Carregar configuração de idiomas
 
-Tipo gerado: sempre **technical**. Se `faq` estiver em `DOC_TYPES` do `.dochubrc` (e `--only` não excluir), pergunte:
+**CRITICAL:** Gere documentação em **TODOS os idiomas** configurados.
+
+```python
+from scripts.i18n_utils import load_i18n
+
+i18n = load_i18n()
+supported_langs = i18n.get_supported_languages()  # ["pt-br", "en-us"]
+primary_lang = i18n.get_primary_language()        # "pt-br"
+```
+
+### 6. Gerar os arquivos em múltiplos idiomas
+
+Tipo gerado: sempre **technical**. Se `faq` estiver em `DOC_TYPES` (e `--only` não excluir), pergunte:
 
 > Deseja gerar também o FAQ? (sim/não)
-
-Se a resposta for não, gere apenas o `technical`.
 
 `{nome}` = último segmento do caminho (ex: `src/payments` → `payments`).
 `{slug}` = `{nome}` em kebab-case.
 
-Determine o caminho de destino dos arquivos:
-- Se `DOCHUB_PATH` estiver definido: salve em `$DOCHUB_PATH/content/teams/$TEAM/{doc_type}/module-{slug}.md`
-- Caso contrário: salve em `/tmp/dochub-docs-module-{slug}/{doc_type}/module-{slug}.md`
+**Para CADA idioma em `supported_langs`**, crie:
+```
+content/{lang}/teams/{team}/{doc_type}/module-{slug}.md
+```
 
-### 6. Confirmar antes de abrir o PR
+**EXEMPLO:** Module `bridge` com SUPPORTED_LANGUAGES="pt-br,en-us":
+```
+✓ content/pt-br/teams/team-1/technical/module-bridge.md
+✓ content/en-us/teams/team-1/technical/module-bridge.md
+```
 
-Exiba os caminhos dos arquivos gerados e uma prévia de cada um (título e primeiras seções).
+❌ **ERRADO:** Criar sem idioma:
+```
+content/teams/team-1/technical/module-bridge.md  ← FALTA IDIOMA
+```
+
+⚠️ **CRITICAL:** Cada arquivo deve ter `language: "{lang}"` no frontmatter.
+
+### 7. Confirmar antes de abrir o PR
+
+Exiba os caminhos dos arquivos gerados **para CADA idioma** e uma prévia de cada um (título e primeiras seções).
+
+**Exemplo de output:**
+```
+✓ Módulo documentado em Português (pt-br):
+  - content/pt-br/teams/team-1/technical/module-bridge.md
+
+✓ Módulo documentado em English (en-us):
+  - content/en-us/teams/team-1/technical/module-bridge.md
+```
 
 Em seguida, pergunte (padrão **não**):
 
@@ -105,7 +138,7 @@ Em seguida, pergunte (padrão **não**):
 
   Aguarde confirmação. Se não, pergunte o que ajustar, corrija e repita esta etapa.
 
-### 7. Abrir PR no docs-hub
+### 8. Abrir PR no docs-hub
 
 > Execute apenas se o usuário escolheu **PR** na etapa anterior.
 
@@ -143,6 +176,7 @@ project: "{PROJECT}"
 doc_type: "technical"
 scope: "module"
 module_path: "{caminho}"
+language: "pt-br"
 tags: []
 draft: false
 ---
@@ -197,6 +231,72 @@ draft: false
 
 ---
 
+### technical — English (en-us)
+
+```markdown
+---
+title: "Module: {name}"
+date: {current ISO 8601 date}
+team: "{TEAM}"
+project: "{PROJECT}"
+doc_type: "technical"
+scope: "module"
+module_path: "{path}"
+language: "en-us"
+tags: []
+draft: false
+---
+
+## Responsibility
+
+[One clear sentence: what this module does and what it does NOT do.]
+
+## Structure
+
+```
+{path}/
+├── {file}       ← {responsibility in 1 line}
+├── {file}       ← {responsibility in 1 line}
+└── {subfolder}/ ← {responsibility in 1 line}
+```
+
+## Inputs and outputs
+
+[What the module receives (inputs, events, calls) and what it produces (outputs, side effects).]
+
+## Internal dependencies
+
+[Other modules that this one uses — and for what.]
+
+## External dependencies
+
+[External libs and services — and what each one is used for.]
+
+## Main flow
+
+```
+[ASCII diagram or step-by-step of what happens when module is triggered]
+```
+
+## Edge cases and important behaviors
+
+[What happens on errors, timeouts, invalid data, unexpected states.]
+
+## How to extend
+
+[How to add functionality without breaking existing. Module conventions and patterns.]
+
+## Tests
+
+[How to run. What is covered and what is not.]
+
+## Relevant history
+
+[Past design decisions that still explain current code. Omit if none.]
+```
+
+---
+
 ### faq
 
 ```markdown
@@ -208,6 +308,7 @@ project: "{PROJECT}"
 doc_type: "faq"
 scope: "module"
 module_path: "{caminho}"
+language: "pt-br"
 draft: false
 ---
 
