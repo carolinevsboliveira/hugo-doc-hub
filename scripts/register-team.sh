@@ -138,14 +138,16 @@ for lang in "${LANGS[@]}"; do
 
     # Criar _index.md
     DOC_DESC=$(python3 "$(dirname "$0")/get-translation.py" --key "register.doc_description" --lang "$lang")
-    DOC_DESC=$(printf "$DOC_DESC" "${TEAM_NAME}")
-    cat > "content/${lang}/teams/${TEAM_ID}/_index.md" <<EOF
+    # Safely format the description string
+    DOC_DESC=${DOC_DESC//"%s"/${TEAM_NAME}}
+
+    cat > "content/${lang}/teams/${TEAM_ID}/_index.md" <<TEAM_EOF
 ---
 title: "${TEAM_NAME}"
 description: "${DOC_DESC}"
 language: "${lang}"
 ---
-EOF
+TEAM_EOF
 
     # Cria seções por doc_type
     IFS=',' read -ra DT_LIST <<< "$TEAM_DOC_TYPES"
@@ -155,13 +157,13 @@ EOF
 
         # Traduzir o título do doc_type
         dt_title=$(python3 "$(dirname "$0")/get-translation.py" --key "doc.${dt}" --lang "$lang")
-        cat > "content/${lang}/teams/${TEAM_ID}/$dt/_index.md" <<EOF
+        cat > "content/${lang}/teams/${TEAM_ID}/$dt/_index.md" <<DOC_TYPE_EOF
 ---
 title: "${dt_title}"
 team: "${TEAM_ID}"
 language: "${lang}"
 ---
-EOF
+DOC_TYPE_EOF
     done
 done
 
