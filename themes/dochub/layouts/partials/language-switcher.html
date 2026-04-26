@@ -1,9 +1,10 @@
 {{ if gt (len .Site.Languages) 1 }}
 <div class="language-switcher">
   <select class="language-select" onchange="changeLanguage(this.value)">
+    {{ $defaultLang := (index .Site.Languages 0).Lang }}
     {{ range .Site.Languages }}
       {{ $langPrefix := "" }}
-      {{ if ne .Lang $.Site.DefaultLanguage }}
+      {{ if ne .Lang $defaultLang }}
         {{ $langPrefix = printf "/%s" .Lang }}
       {{ end }}
       {{ $currentPath := $.RelPermalink }}
