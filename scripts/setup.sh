@@ -3,6 +3,14 @@
 
 set -e
 
+# Helper function to trim whitespace
+trim() {
+    local var="$1"
+    var="${var#"${var%%[![:space:]]*}"}"   # Remove leading whitespace
+    var="${var%"${var##*[![:space:]]}"}"   # Remove trailing whitespace
+    printf '%s' "$var"
+}
+
 echo "╔══════════════════════════════════════╗"
 echo "║       DocHub — Setup Rápido          ║"
 echo "╚══════════════════════════════════════╝"
@@ -69,7 +77,8 @@ echo ""
 # Cria diretórios de conteúdo para cada idioma suportado
 IFS=',' read -ra langs <<< "$SUPPORTED_LANGUAGES"
 for lang in "${langs[@]}"; do
-    lang=$(echo "$lang" | xargs)
+    lang=$(trim "$lang")
+    [[ -z "$lang" ]] && continue
     mkdir -p "content/$lang/teams"
     echo "✓ Criado diretório de conteúdo: content/$lang"
 done
