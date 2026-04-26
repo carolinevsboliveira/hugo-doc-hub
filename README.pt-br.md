@@ -148,7 +148,7 @@ bash scripts/register-team.sh --id team-xyz --name "Time XYZ" --pr
 
 ### ✨ Modo simplificado (recomendado) — Skills
 
-Use as skills integradas no Claude Code:
+As skills integradas no Claude Code permitem gerar documentação com um comando:
 
 ```bash
 /doc-pr 142              # Documentação de um PR
@@ -156,14 +156,41 @@ Use as skills integradas no Claude Code:
 /doc-module src/payments # Documentação de um módulo
 ```
 
-As skills:
+**O que as skills fazem:**
 - ✅ Detectam projeto/time automaticamente
 - ✅ Fazem perguntas apenas quando necessário
 - ✅ Geram documentação técnica, produto e FAQ
 - ✅ **Geram em TODOS os idiomas suportados** (i18n)
 - ✅ Oferecem abrir PR automaticamente
 
-**Exemplos com i18n:**
+#### 🔧 Como usar em outro repositório
+
+As skills estão disponíveis **automaticamente** quando você abre o Claude Code em qualquer repositório, desde que o **DocHub esteja clonado** na sua máquina.
+
+**Pré-requisito:** Clone o DocHub em um local acessível:
+```bash
+git clone https://github.com/carolinevsboliveira/hugo-doc-hub.git ~/projects/hugo-doc-hub
+# Ou em qualquer outro local que preferir
+```
+
+**Depois, ao abrir outro repositório no Claude Code:**
+1. Os comandos `/doc-pr`, `/doc-feature` e `/doc-module` estarão disponíveis
+2. As skills funcionam normalmente, independente do repositório
+3. A documentação gerada é salva no repositório DocHub (conforme configuração de `--team` e `--output`)
+
+**Exemplo em outro repositório:**
+```bash
+# Abrir outro repositório no Claude Code
+cd ~/projects/meu-app
+
+# Usar os comandos do DocHub
+/doc-pr 142              # Gera docs no DocHub para o PR #142
+/doc-feature pix-support # Gera docs de feature
+/doc-module src/payments # Gera docs de módulo
+```
+
+#### Exemplos com opções
+
 ```bash
 # Gera em pt-br e en-us (se SUPPORTED_LANGUAGES="pt-br,en-us")
 /doc-pr 142
@@ -172,6 +199,9 @@ As skills:
 /doc-pr 142 --languages pt-br,en-us
 /doc-feature pix-support --languages pt-br
 /doc-module src/payments --languages en-us
+
+# Especificar time e projeto
+/doc-pr 142 --team team-payments --project api-payments
 ```
 
 ### Modo avançado (Python direto)
@@ -281,6 +311,34 @@ draft: false
 Se não tiver `gh` instalado, você pode:
 1. Instalar: https://cli.github.com
 2. Ou fazer commit/push manualmente e abrir PR no GitHub
+
+### Como usar os comandos em outros repositórios
+
+Para que as skills `/doc-pr`, `/doc-feature` e `/doc-module` funcionem em **qualquer repositório**, o DocHub deve estar disponível localmente.
+
+**Opção 1: Clone global (recomendado)**
+
+```bash
+# Clone uma vez em um local fixo
+git clone https://github.com/carolinevsboliveira/hugo-doc-hub.git ~/projects/hugo-doc-hub
+
+# Agora os comandos /doc-* funcionam em qualquer repositório
+cd ~/projects/meu-outro-app
+/doc-pr 123
+```
+
+**Opção 2: Abra o DocHub no Claude Code**
+
+Abra o repositório DocHub primeiro no Claude Code, e as skills estarão disponíveis para usar em outros repositórios também.
+
+**Opção 3: Configure um alias (avançado)**
+
+Para usar com projeto específico, configure no `.env` do seu repositório:
+```bash
+export DOCHUB_PATH="~/projects/hugo-doc-hub"
+export DOCHUB_TEAM="seu-time"
+export DOCHUB_LANGUAGES="pt-br,en-us"
+```
 
 ### Scripts de i18n
 
