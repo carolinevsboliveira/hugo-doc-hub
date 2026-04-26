@@ -1,19 +1,24 @@
 {{ if gt (len .Site.Languages) 1 }}
 <div class="language-switcher">
-  <select class="language-select" onchange="changeLanguage(this.value)">
-    {{ $defaultLang := (index .Site.Languages 0).Lang }}
-    {{ $currentLang := .Lang }}
-    {{ range .Site.Languages }}
-      {{ $langPrefix := "" }}
-      {{ if ne .Lang $defaultLang }}
-        {{ $langPrefix = printf "/%s" .Lang }}
-      {{ end }}
-      {{ $isActive := eq $currentLang .Lang }}
-      <option value="{{ $langPrefix }}" {{ if $isActive }}selected{{ end }}>
-        {{ .LanguageName }}
-      </option>
+  {{ $defaultLang := (index .Site.Languages 0).Lang }}
+  {{ $currentLang := .Lang }}
+  {{ range .Site.Languages }}
+    {{ $langPrefix := "" }}
+    {{ if ne .Lang $defaultLang }}
+      {{ $langPrefix = printf "/%s" .Lang }}
     {{ end }}
-  </select>
+    {{ $isActive := eq $currentLang .Lang }}
+    <button
+      class="language-btn {{ if $isActive }}language-btn--active{{ end }}"
+      onclick="changeLanguage('{{ $langPrefix }}')"
+      title="Switch to {{ .LanguageName }}"
+    >
+      <span class="language-icon">
+        {{ if eq .Lang "en-us" }}🌐{{ else if eq .Lang "pt-br" }}🇧🇷{{ else }}🌍{{ end }}
+      </span>
+      <span class="language-name">{{ .LanguageName }}</span>
+    </button>
+  {{ end }}
 </div>
 
 <script>
@@ -46,50 +51,75 @@ function changeLanguage(newPath) {
 .language-switcher {
   display: flex;
   align-items: center;
-  gap: 0;
+  gap: 0.75rem;
+  flex-wrap: wrap;
 }
 
-.language-select {
-  padding: 0.625rem 2.5rem 0.625rem 0.875rem;
-  border: 1.5px solid var(--color-border, #e0e0e0);
-  border-radius: 6px;
+.language-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.625rem 1rem;
+  border: 1.5px solid var(--color-border, #d0d0d0);
+  border-radius: 8px;
   background-color: var(--color-bg, #ffffff);
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath fill='%23333' d='M1 1l5 5 5-5'/%3E%3C/svg%3E");
-  background-repeat: no-repeat;
-  background-position: right 0.75rem center;
-  background-size: 12px;
   color: var(--color-text, #333);
   font-size: 0.9rem;
   font-weight: 500;
   cursor: pointer;
   transition: all 0.2s ease;
-  appearance: none;
-  -webkit-appearance: none;
-  -moz-appearance: none;
+  white-space: nowrap;
 }
 
-.language-select:hover {
+.language-btn:hover {
   border-color: var(--color-primary, #0066cc);
   background-color: var(--color-bg-hover, #f8f9fa);
   box-shadow: 0 2px 8px rgba(0, 102, 204, 0.15);
+  transform: translateY(-2px);
 }
 
-.language-select:focus {
-  outline: none;
+.language-btn:active {
+  transform: translateY(0);
+}
+
+.language-btn--active {
   border-color: var(--color-primary, #0066cc);
-  box-shadow: 0 0 0 3px rgba(0, 102, 204, 0.1);
-}
-
-.language-select option {
-  padding: 0.5rem;
-  background-color: var(--color-bg, #ffffff);
-  color: var(--color-text, #333);
-}
-
-.language-select option:checked {
   background-color: var(--color-primary, #0066cc);
   color: white;
+  box-shadow: 0 2px 12px rgba(0, 102, 204, 0.25);
   font-weight: 600;
+}
+
+.language-btn--active:hover {
+  background-color: var(--color-primary-dark, #0052a3);
+  border-color: var(--color-primary-dark, #0052a3);
+  box-shadow: 0 4px 16px rgba(0, 102, 204, 0.35);
+}
+
+.language-icon {
+  font-size: 1.1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.language-name {
+  display: inline;
+}
+
+@media (max-width: 768px) {
+  .language-switcher {
+    gap: 0.5rem;
+  }
+
+  .language-btn {
+    padding: 0.5rem 0.75rem;
+    font-size: 0.85rem;
+  }
+
+  .language-icon {
+    font-size: 1rem;
+  }
 }
 </style>
 {{ end }}
