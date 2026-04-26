@@ -1,0 +1,42 @@
+# English (US) translations
+# Format: key: "translation"
+
+# Navigation
+nav.home: "Home"
+nav.teams: "Teams"
+nav.search: "Search"
+nav.documentation: "Documentation"
+
+# Common UI
+ui.back: "Back"
+ui.next: "Next"
+ui.previous: "Previous"
+ui.language: "Language"
+ui.github: "GitHub"
+
+# Search
+search.placeholder: "Search documentation..."
+search.no_results: "No results found"
+search.results: "Search results"
+
+# Documentation
+doc.technical: "Technical"
+doc.product: "Product"
+doc.faq: "FAQ"
+doc.updated: "Updated at"
+doc.author: "Author"
+
+# Teams
+team.overview: "Overview"
+team.documentation: "Documentation"
+team.repositories: "Repositories"
+
+# Footer
+footer.organization: "Organization"
+footer.powered_by: "Powered by"
+
+# Errors
+error.404: "Page not found"
+error.404_message: "The page you are looking for does not exist."
+error.500: "Internal error"
+error.500_message: "Something went wrong. Please try again later."

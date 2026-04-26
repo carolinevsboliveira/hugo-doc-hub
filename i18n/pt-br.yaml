@@ -1,0 +1,42 @@
+# Portuguese (Brazil) translations
+# Format: key: "translation"
+
+# Navigation
+nav.home: "Início"
+nav.teams: "Times"
+nav.search: "Buscar"
+nav.documentation: "Documentação"
+
+# Common UI
+ui.back: "Voltar"
+ui.next: "Próximo"
+ui.previous: "Anterior"
+ui.language: "Idioma"
+ui.github: "GitHub"
+
+# Search
+search.placeholder: "Buscar na documentação..."
+search.no_results: "Nenhum resultado encontrado"
+search.results: "Resultados da busca"
+
+# Documentation
+doc.technical: "Técnica"
+doc.product: "Produto"
+doc.faq: "FAQ"
+doc.updated: "Atualizado em"
+doc.author: "Autor"
+
+# Teams
+team.overview: "Visão geral"
+team.documentation: "Documentação"
+team.repositories: "Repositórios"
+
+# Footer
+footer.organization: "Organização"
+footer.powered_by: "Powered by"
+
+# Errors
+error.404: "Página não encontrada"
+error.404_message: "A página que você está procurando não existe."
+error.500: "Erro interno"
+error.500_message: "Algo deu errado. Tente novamente mais tarde."
