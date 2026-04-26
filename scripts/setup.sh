@@ -25,6 +25,8 @@ else
     ORG_NAME="${ORG_NAME:-Sua Empresa}"
     SITE_TITLE="${SITE_TITLE:-DocHub}"
     BASE_URL="${BASE_URL:-http://localhost:1313}"
+    LANGUAGE_CODE="${LANGUAGE_CODE:-pt-br}"
+    SUPPORTED_LANGUAGES="${SUPPORTED_LANGUAGES:-pt-br}"
 fi
 
 echo ""
@@ -34,10 +36,16 @@ echo ""
 # Atualiza hugo.toml com os valores do .env
 sed -i.bak \
     "s|^baseURL = .*|baseURL = \"$BASE_URL\"|; \
+     s|^languageCode = .*|languageCode = \"$LANGUAGE_CODE\"|; \
      s|^title = .*|title = \"$SITE_TITLE\"|; \
      s|org.*= \".*\"|org         = \"$ORG_NAME\"|; \
      s|description.*= \".*\"|description = \"Documentação centralizada de todos os times de $ORG_NAME\"|" \
     hugo.toml && rm -f hugo.toml.bak
+
+echo "✓ Hugo configurado (baseURL, languageCode, title, org, description)"
+echo "  - Base URL: $BASE_URL"
+echo "  - Idioma principal: $LANGUAGE_CODE"
+echo "  - Idiomas suportados: $SUPPORTED_LANGUAGES"
 
 # Limpa conteúdo de exemplo
 if [[ -d "content/teams/sample" ]]; then
@@ -51,6 +59,21 @@ teams: []
 EOF
 
 echo "✓ Estrutura de dados resetada"
+echo ""
+
+# Configura i18n baseado em variáveis de ambiente
+echo "Configurando internacionalização (i18n)..."
+python3 scripts/manage-i18n.py
+echo ""
+
+# Cria diretórios de conteúdo para cada idioma suportado
+IFS=',' read -ra langs <<< "$SUPPORTED_LANGUAGES"
+for lang in "${langs[@]}"; do
+    lang=$(echo "$lang" | xargs)
+    mkdir -p "content/$lang/teams"
+    echo "✓ Criado diretório de conteúdo: content/$lang"
+done
+
 echo ""
 echo "╔══════════════════════════════════════╗"
 echo "║         Setup concluído! 🎉          ║"

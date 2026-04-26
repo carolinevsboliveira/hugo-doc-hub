@@ -5,11 +5,33 @@ theme = "dochub"
 enableRobotsTXT = true
 enableGitInfo = true
 
+# Default language for the site
+defaultContentLanguage = "pt-br"
+defaultContentLanguageInSubdir = false
+
 [params]
   org         = "Sua Empresa"
   description = "Documentação centralizada de todos os times"
   version     = "1.0.0"
   github      = "https://github.com/your-org/docs-hub"
+
+  # i18n configuration
+    
+# Language configuration (can be extended with additional languages)
+
+
+
+
+[languages."pt-br"]
+  languageName = "Português (Brasil)"
+  weight = 1
+  contentDir = "content/pt-br"
+
+
+[languages."en-us"]
+  languageName = "English (US)"
+  weight = 2
+  contentDir = "content/en-us"
 
 [outputs]
   home    = ["HTML", "RSS", "JSON"]
