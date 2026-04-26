@@ -2,6 +2,8 @@
 
 Gera documentação completa de uma feature — técnica, produto e FAQ — a partir de um ou mais PRs, uma branch ou um período.
 
+Suporta geração automática em todos os idiomas configurados via `SUPPORTED_LANGUAGES`.
+
 ## Uso
 
 ```
@@ -12,23 +14,40 @@ Gera documentação completa de uma feature — técnica, produto e FAQ — a pa
 ```
 /doc-feature pix-support
 /doc-feature sso-auth
+/doc-feature pix-support --languages pt-br,en-us
+/doc-feature sso-auth --team team-auth --prs 150,151
 ```
 
 **Parâmetros opcionais:**
 - `--prs <n1,n2,n3>` — números de PRs específicos
 - `--branch <nome>` — ou use uma branch em vez de PRs
 - `--team <id>` — time (detecta automaticamente se não informado)
+- `--languages <lang1,lang2>` — idiomas específicos (padrão: todos do SUPPORTED_LANGUAGES)
 
 ---
 
 ## O que fazer ao receber este comando
 
-### 1. Uma pergunta só
+### 1. Detectar configuração de i18n
+
+Leia variáveis de ambiente ou carregue do `.env`:
+
+```python
+from scripts.i18n_utils import load_i18n
+
+i18n = load_i18n()
+primary_lang = i18n.get_primary_language()      # "pt-br"
+supported_langs = i18n.get_supported_languages() # ["pt-br", "en-us"]
+```
+
+Se `--languages` foi passado, use apenas aqueles. Senão, use `SUPPORTED_LANGUAGES`.
+
+### 2. Uma pergunta só
 
 Se não informado `--prs` ou `--branch`: **pergunta uma vez apenas**:
 - "Quais PRs? (ex: 138,141,145) Ou deixe em branco para usar a branch atual."
 
-### 2. Coletar contexto
+### 3. Coletar contexto
 
 **Se PRs foram informados:**
 ```bash
@@ -50,22 +69,34 @@ git diff main...{branch} | head -400
 find . -path ./node_modules -prune -o -name "*.test.*" -newer README.md -print | head -20
 ```
 
-### 3. Gerar os arquivos
+### 4. Gerar os arquivos em múltiplos idiomas
 
 Sempre gera **technical** e **product**. Gera **faq** se estiver nos `doc_types` do time em `data/teams.yaml`.
 
-**Caminhos:**
+**Para cada idioma suportado:**
+
 ```
-content/teams/{team}/technical/feature-{slug}.md
-content/teams/{team}/product/feature-{slug}.md
-content/teams/{team}/faq/faq-{slug}.md        ← se faq estiver ativo
+content/{lang}/teams/{team}/technical/feature-{slug}.md
+content/{lang}/teams/{team}/product/feature-{slug}.md
+content/{lang}/teams/{team}/faq/faq-{slug}.md        ← se faq estiver ativo
+```
+
+**Exemplo:** Feature "pix-support" com 2 idiomas:
+```
+content/pt-br/teams/team-payments/technical/feature-pix-support.md
+content/pt-br/teams/team-payments/product/feature-pix-support.md
+content/pt-br/teams/team-payments/faq/faq-pix-support.md
+
+content/en-us/teams/team-payments/technical/feature-pix-support.md
+content/en-us/teams/team-payments/product/feature-pix-support.md
+content/en-us/teams/team-payments/faq/faq-pix-support.md
 ```
 
 ---
 
 ## Templates
 
-### technical — `content/teams/{team}/technical/feature-{slug}.md`
+### technical — Português (pt-br)
 
 ```markdown
 ---
@@ -75,6 +106,7 @@ team: "{team}"
 project: "{project}"
 doc_type: "technical"
 scope: "feature"
+language: "pt-br"
 tags: []
 draft: false
 ---
@@ -93,9 +125,9 @@ draft: false
 
 ## Fluxo principal
 
-```
+\`\`\`
 [diagrama ASCII ou passo a passo do fluxo de dados/execução]
-```
+\`\`\`
 
 ## APIs e contratos
 
@@ -110,72 +142,55 @@ draft: false
 [Roteiro completo de teste da feature.]
 ```
 
----
-
-### product — `content/teams/{team}/product/feature-{slug}.md`
+### technical — English (en-us)
 
 ```markdown
 ---
-title: "Feature: {nome da feature}"
-date: {data ISO 8601 atual}
+title: "Feature: {feature name}"
+date: {current ISO 8601 date}
 team: "{team}"
 project: "{project}"
-doc_type: "product"
+doc_type: "technical"
 scope: "feature"
-status: "shipped"
+language: "en-us"
+tags: []
 draft: false
 ---
 
-## O que é
+## What is it
 
-[Descrição em linguagem não-técnica, 2-3 linhas.]
+[Technical description in 3-5 lines. What it does and what problem it solves from an engineering perspective.]
 
-## Problema que resolve
+## Architecture and design decisions
 
-[Do ponto de vista do usuário ou do negócio.]
+[How it was implemented. Patterns used. Alternatives considered and why they were discarded.]
 
-## Como funciona
+## Components and responsibilities
 
-[Passo a passo funcional. Sem jargão técnico.]
+[Map of modules/services involved and what each one does in this feature.]
 
-## Quem é impactado
+## Main flow
 
-[Times, usuários, integrações, sistemas externos.]
+\`\`\`
+[ASCII diagram or step-by-step explanation of data/execution flow]
+\`\`\`
 
-## Disponibilidade
+## APIs and contracts
 
-[Feature flag? Rollout gradual? Data de GA?]
+[New or altered endpoints, payloads, expected errors. Only if applicable.]
 
-## Limitações conhecidas
+## Required configuration
 
-[O que ainda não é suportado nesta versão. Omitir se não houver.]
+[Environment variables, flags, dependencies that need to be active.]
 
-## Próximos passos
+## How to test end-to-end
 
-[Evoluções planejadas. Omitir se não houver.]
+[Complete feature test roadmap.]
 ```
 
----
+### product — Similar structure, translated for each language
 
-### faq — `content/teams/{team}/faq/faq-{slug}.md`
-
-```markdown
----
-title: "FAQ — {nome da feature}"
-date: {data ISO 8601 atual}
-team: "{team}"
-project: "{project}"
-doc_type: "faq"
-scope: "feature"
-draft: false
----
-
-[Gere 6-10 perguntas pensando em: devs que vão integrar, QA, produto, suporte.
-Inclua perguntas sobre casos de borda, erros comuns e migração.]
-
-### P: [pergunta]
-**R:** [resposta direta e acionável]
-```
+### faq — Similar structure, translated for each language
 
 ---
 
@@ -183,6 +198,7 @@ Inclua perguntas sobre casos de borda, erros comuns e migração.]
 
 - **Git** — para oferecer opção de PR (obrigatório)
 - **GitHub CLI (gh)** — para abrir PR automaticamente (obrigatório se usar PR)
+- **i18n_utils.py** — para carregar configuração de idiomas
 
 Se `gh` não estiver instalado mas o usuário escolher PR, mostre:
 ```
@@ -194,4 +210,15 @@ Instale em https://cli.github.com
 
 ## Ao finalizar
 
-Mostre: ✓ Docs da feature criadas em `content/teams/{team}/...`
+Mostre para cada idioma:
+```
+✓ Documentação de feature criada em português (pt-br):
+  - content/pt-br/teams/{team}/technical/feature-{slug}.md
+  - content/pt-br/teams/{team}/product/feature-{slug}.md
+
+✓ Documentação de feature criada em inglês (en-us):
+  - content/en-us/teams/{team}/technical/feature-{slug}.md
+  - content/en-us/teams/{team}/product/feature-{slug}.md
+```
+
+Se apenas um idioma: mostre apenas aquele.

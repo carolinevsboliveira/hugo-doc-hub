@@ -2,6 +2,8 @@
 
 Gera documentação técnica, de produto e/ou FAQ a partir de um PR do GitHub.
 
+Suporta geração automática em todos os idiomas configurados via `SUPPORTED_LANGUAGES`.
+
 ## Uso
 
 ```
@@ -11,23 +13,40 @@ Gera documentação técnica, de produto e/ou FAQ a partir de um PR do GitHub.
 **Exemplos:**
 ```
 /doc-pr 142
+/doc-pr 142 --languages pt-br,en-us
+/doc-pr 142 --team team-payments --only technical
 ```
 
 **Parâmetros opcionais:**
 - `--team <id>` — time (detecta automaticamente se não informado)
 - `--only <tipo>` — gera apenas um tipo (technical/product/faq, padrão: todos)
+- `--languages <lang1,lang2>` — idiomas específicos (padrão: todos do SUPPORTED_LANGUAGES)
 
 ---
 
 ## O que fazer ao receber este comando
 
-### 1. Validar parâmetros
+### 1. Detectar configuração de i18n
+
+Leia variáveis de ambiente ou carregue do `.env`:
+
+```python
+from scripts.i18n_utils import load_i18n
+
+i18n = load_i18n()
+primary_lang = i18n.get_primary_language()      # "pt-br"
+supported_langs = i18n.get_supported_languages() # ["pt-br", "en-us"]
+```
+
+Se `--languages` foi passado, use apenas aqueles. Senão, use `SUPPORTED_LANGUAGES`.
+
+### 2. Validar parâmetros
 
 - `número` — obrigatório. Número do PR.
 - `--team` — se não informado: tenta detectar do primeiro time em `data/teams.yaml` ou **pergunta uma vez** ao usuário.
 - `--only` — se não informado: usa todos os `doc_types` do time.
 
-### 2. Coletar contexto do PR (simplificado)
+### 3. Coletar contexto do PR (simplificado)
 
 Se `gh` estiver disponível:
 ```bash
@@ -41,33 +60,42 @@ Se não: **pergunta rápida**:
 
 (Contexto mínimo é suficiente — Claude completa as lacunas.)
 
-### 3. Determinar os tipos a gerar
+### 4. Determinar os tipos a gerar
 
 Consulte `data/teams.yaml` para o time informado e use os `doc_types` registrados.
 Se `--only` foi passado, filtre para apenas aqueles tipos.
 
-### 4. Gerar os arquivos
+### 5. Gerar os arquivos em múltiplos idiomas
 
-Para cada tipo, gere o arquivo correspondente e salve em:
+**Para cada idioma suportado**, gere os arquivos:
 
 ```
-content/teams/{team}/{doc_type}/pr-{número}-{slug}.md
+content/{lang}/teams/{team}/{doc_type}/pr-{número}-{slug}.md
 ```
 
-Onde `{slug}` é o título do PR em kebab-case, máximo 50 caracteres.
-
-**Exemplo:** PR #142 "Add PIX payment support" do team-payments →
+**Exemplo:** PR #142 "Add PIX payment support" do team-payments em pt-br e en-us:
 ```
-content/teams/team-payments/technical/pr-142-add-pix-payment-support.md
-content/teams/team-payments/product/pr-142-add-pix-payment-support.md
-content/teams/team-payments/faq/pr-142-add-pix-payment-support.md
+content/pt-br/teams/team-payments/technical/pr-142-add-pix-payment-support.md
+content/pt-br/teams/team-payments/product/pr-142-add-pix-payment-support.md
+content/en-us/teams/team-payments/technical/pr-142-add-pix-payment-support.md
+content/en-us/teams/team-payments/product/pr-142-add-pix-payment-support.md
+```
+
+### 6. Usar tradução de títulos e metadados
+
+Para cada idioma, traduza os títulos de seção usando o módulo i18n:
+
+```python
+i18n = load_i18n()
+title_technical = i18n.translate("doc.technical", language="en-us")  # "Technical"
+title_product = i18n.translate("doc.product", language="pt-br")      # "Produto"
 ```
 
 ---
 
-## Templates por tipo
+## Templates por tipo e idioma
 
-### technical
+### technical — Português (pt-br)
 
 ```markdown
 ---
@@ -78,6 +106,7 @@ project: "{project}"
 doc_type: "technical"
 scope: "pr"
 pr: "{número}"
+language: "pt-br"
 tags: []
 draft: false
 ---
@@ -104,9 +133,9 @@ Foque na intenção, não na listagem mecânica de arquivos.]
 
 ## Como testar
 
-```bash
+\`\`\`bash
 [comandos reais extraídos do PR ou do README]
-```
+\`\`\`
 
 [Casos de teste relevantes a cobrir]
 
@@ -115,66 +144,58 @@ Foque na intenção, não na listagem mecânica de arquivos.]
 [Débito técnico gerado, decisões de design, próximos passos — só se existirem]
 ```
 
----
-
-### product
+### technical — English (en-us)
 
 ```markdown
 ---
-title: "{título do PR — reformulado para linguagem de produto}"
-date: {data ISO 8601 atual}
+title: "{PR title}"
+date: {current ISO 8601 date}
 team: "{team}"
 project: "{project}"
-doc_type: "product"
+doc_type: "technical"
 scope: "pr"
-pr: "{número}"
-status: "shipped"
+pr: "{number}"
+language: "en-us"
+tags: []
 draft: false
 ---
 
-## O que muda
+## Summary
 
-[2-3 linhas em linguagem não-técnica. Foque em valor, não em implementação.]
+[2-3 lines. What changed and why. Don't repeat the title.]
 
-## Problema que resolve
+## Context
 
-[Do ponto de vista do usuário ou do negócio.]
+[Problem that motivated the PR. Link to issue/ticket if it exists in the PR body.]
 
-## Como funciona agora
+## What was changed
 
-[Passo a passo funcional. Sem jargão técnico.]
+[For each file or relevant group, one line explaining why the change was made.
+Focus on intent, not mechanical file listing.]
 
-## Quem é impactado
+## Impact
 
-[Times, usuários, integrações, sistemas externos.]
+- **Breaking change?** Yes/No — [detail if yes]
+- **Performance:** [if relevant]
+- **Security:** [if relevant]
+- **New dependencies:** [if relevant]
 
-## Disponibilidade
+## How to test
 
-[Já em produção? Feature flag? Rollout gradual?]
+\`\`\`bash
+[real commands extracted from PR or README]
+\`\`\`
+
+[Relevant test cases to cover]
+
+## Notes
+
+[Technical debt generated, design decisions, next steps — only if they exist]
 ```
 
----
+### product — Similar structure, translated for each language
 
-### faq
-
-```markdown
----
-title: "FAQ — {título do PR}"
-date: {data ISO 8601 atual}
-team: "{team}"
-project: "{project}"
-doc_type: "faq"
-scope: "pr"
-pr: "{número}"
-draft: false
----
-
-[Gere 5-8 perguntas pensando em: devs que vão integrar, QA, produto, suporte.
-Inclua perguntas sobre casos de borda e erros comuns visíveis no diff.]
-
-### P: [pergunta]
-**R:** [resposta direta e acionável]
-```
+### faq — Similar structure, translated for each language
 
 ---
 
@@ -182,6 +203,7 @@ Inclua perguntas sobre casos de borda e erros comuns visíveis no diff.]
 
 - **Git** — para oferecer opção de PR (obrigatório)
 - **GitHub CLI (gh)** — para abrir PR automaticamente (obrigatório se usar PR)
+- **i18n_utils.py** — para carregar configuração de idiomas
 
 Se `gh` não estiver instalado mas o usuário escolher PR, mostre:
 ```
@@ -193,4 +215,15 @@ Instale em https://cli.github.com
 
 ## Ao finalizar
 
-Mostre: ✓ Documentação criada em `content/teams/{team}/...`
+Mostre para cada idioma:
+```
+✓ Documentação criada em português (pt-br):
+  - content/pt-br/teams/{team}/technical/...
+  - content/pt-br/teams/{team}/product/...
+
+✓ Documentação criada em inglês (en-us):
+  - content/en-us/teams/{team}/technical/...
+  - content/en-us/teams/{team}/product/...
+```
+
+Se apenas um idioma: mostre apenas aquele.
