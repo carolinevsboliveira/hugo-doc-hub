@@ -1,28 +1,52 @@
 {{ if gt (len .Site.Languages) 1 }}
-<div class="language-switcher">
-  {{ $defaultLang := (index .Site.Languages 0).Lang }}
-  {{ $currentLang := .Lang }}
-  {{ range .Site.Languages }}
-    {{ $langPrefix := "" }}
-    {{ if ne .Lang $defaultLang }}
-      {{ $langPrefix = printf "/%s" .Lang }}
+<div class="language-switcher-container">
+  <button class="language-toggle" aria-label="Toggle language menu" onclick="toggleLanguageMenu(event)">
+    <svg class="language-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <circle cx="12" cy="12" r="10"></circle>
+      <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path>
+      <line x1="2" y1="12" x2="22" y2="12"></line>
+    </svg>
+  </button>
+
+  <div class="language-menu" id="languageMenu">
+    {{ $defaultLang := (index .Site.Languages 0).Lang }}
+    {{ $currentLang := .Lang }}
+    {{ range .Site.Languages }}
+      {{ $langPrefix := "" }}
+      {{ if ne .Lang $defaultLang }}
+        {{ $langPrefix = printf "/%s" .Lang }}
+      {{ end }}
+      {{ $isActive := eq $currentLang .Lang }}
+      <button
+        class="language-option {{ if $isActive }}language-option--active{{ end }}"
+        onclick="changeLanguage('{{ $langPrefix }}')"
+        data-lang="{{ .Lang }}"
+      >
+        <span class="language-option-flag">
+          {{ if eq .Lang "en-us" }}🌐{{ else if eq .Lang "pt-br" }}🇧🇷{{ else }}🌍{{ end }}
+        </span>
+        <span class="language-option-name">{{ .LanguageName }}</span>
+        {{ if $isActive }}
+        <svg class="checkmark" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="20 6 9 17 4 12"></polyline>
+        </svg>
+        {{ end }}
+      </button>
     {{ end }}
-    {{ $isActive := eq $currentLang .Lang }}
-    <button
-      class="language-btn {{ if $isActive }}language-btn--active{{ end }}"
-      onclick="changeLanguage('{{ $langPrefix }}')"
-      title="Switch to {{ .LanguageName }}"
-    >
-      <span class="language-icon">
-        {{ if eq .Lang "en-us" }}🌐{{ else if eq .Lang "pt-br" }}🇧🇷{{ else }}🌍{{ end }}
-      </span>
-      <span class="language-name">{{ .LanguageName }}</span>
-    </button>
-  {{ end }}
+  </div>
 </div>
 
 <script>
+function toggleLanguageMenu(event) {
+  event.stopPropagation();
+  const menu = document.getElementById('languageMenu');
+  menu.classList.toggle('active');
+}
+
 function changeLanguage(newPath) {
+  const menu = document.getElementById('languageMenu');
+  menu.classList.remove('active');
+
   if (!newPath) {
     window.location.href = '/';
   } else {
@@ -45,80 +69,128 @@ function changeLanguage(newPath) {
     }
   }
 }
+
+document.addEventListener('click', function(event) {
+  const container = document.querySelector('.language-switcher-container');
+  const menu = document.getElementById('languageMenu');
+  if (container && !container.contains(event.target)) {
+    menu.classList.remove('active');
+  }
+});
 </script>
 
 <style>
-.language-switcher {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-  flex-wrap: wrap;
+.language-switcher-container {
+  position: relative;
+  display: inline-block;
 }
 
-.language-btn {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  padding: 0.625rem 1rem;
-  border: 1.5px solid var(--color-border, #d0d0d0);
-  border-radius: 8px;
-  background-color: var(--color-bg, #ffffff);
-  color: var(--color-text, #333);
-  font-size: 0.9rem;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  white-space: nowrap;
-}
-
-.language-btn:hover {
-  border-color: var(--color-primary, #0066cc);
-  background-color: var(--color-bg-hover, #f8f9fa);
-  box-shadow: 0 2px 8px rgba(0, 102, 204, 0.15);
-  transform: translateY(-2px);
-}
-
-.language-btn:active {
-  transform: translateY(0);
-}
-
-.language-btn--active {
-  border-color: var(--color-primary, #0066cc);
-  background-color: var(--color-primary, #0066cc);
-  color: white;
-  box-shadow: 0 2px 12px rgba(0, 102, 204, 0.25);
-  font-weight: 600;
-}
-
-.language-btn--active:hover {
-  background-color: var(--color-primary-dark, #0052a3);
-  border-color: var(--color-primary-dark, #0052a3);
-  box-shadow: 0 4px 16px rgba(0, 102, 204, 0.35);
-}
-
-.language-icon {
-  font-size: 1.1rem;
+.language-toggle {
   display: flex;
   align-items: center;
   justify-content: center;
+  width: 2rem;
+  height: 2rem;
+  padding: 0;
+  border: 1px solid var(--color-border, #e5e5e5);
+  border-radius: 0.5rem;
+  background-color: var(--color-bg, #ffffff);
+  color: var(--color-text, #333);
+  cursor: pointer;
+  transition: all 0.2s ease;
 }
 
-.language-name {
-  display: inline;
+.language-toggle:hover {
+  border-color: var(--color-primary, #0066cc);
+  background-color: var(--color-bg-hover, #f5f5f5);
 }
 
-@media (max-width: 768px) {
-  .language-switcher {
-    gap: 0.5rem;
+.language-toggle:active,
+.language-menu.active ~ .language-toggle {
+  border-color: var(--color-primary, #0066cc);
+  background-color: var(--color-bg-hover, #f5f5f5);
+}
+
+.language-icon {
+  width: 1.2rem;
+  height: 1.2rem;
+  stroke: currentColor;
+}
+
+.language-menu {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  margin-top: 0.5rem;
+  min-width: 200px;
+  background-color: var(--color-bg, #ffffff);
+  border: 1px solid var(--color-border, #e5e5e5);
+  border-radius: 0.75rem;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(-8px);
+  transition: all 0.2s ease;
+  z-index: 1000;
+  overflow: hidden;
+}
+
+.language-menu.active {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+}
+
+.language-option {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  width: 100%;
+  padding: 0.75rem 1rem;
+  border: none;
+  background-color: transparent;
+  color: var(--color-text, #333);
+  text-align: left;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.language-option:hover {
+  background-color: var(--color-bg-hover, #f5f5f5);
+}
+
+.language-option--active {
+  background-color: var(--color-bg-hover, #f5f5f5);
+  color: var(--color-primary, #0066cc);
+  font-weight: 600;
+}
+
+.language-option-flag {
+  font-size: 1.2rem;
+  width: 1.5rem;
+  text-align: center;
+}
+
+.language-option-name {
+  flex: 1;
+}
+
+.checkmark {
+  width: 1rem;
+  height: 1rem;
+  color: var(--color-primary, #0066cc);
+  flex-shrink: 0;
+}
+
+@media (max-width: 640px) {
+  .language-menu {
+    min-width: 180px;
   }
 
-  .language-btn {
-    padding: 0.5rem 0.75rem;
+  .language-option {
+    padding: 0.65rem 0.85rem;
     font-size: 0.85rem;
-  }
-
-  .language-icon {
-    font-size: 1rem;
   }
 }
 </style>
