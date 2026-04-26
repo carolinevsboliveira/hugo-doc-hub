@@ -125,15 +125,21 @@ draft: false
 
 ## Dependências opcionais
 
-Estas ferramentas são **opcionais** e habilitam funcionalidades de automação:
+| Ferramenta | Para quê | Obrigatório? |
+|-----------|----------|--------------|
+| **Git** | Versionamento e PRs | Opcional, mas recomendado |
+| **GitHub CLI (gh)** | Abrir PR automaticamente | Requerido se usar `--pr` |
+| **Hugo extended** | Build local com SCSS/SASS | Opcional (para desenvolvimento) |
 
-| Ferramenta | Funcionalidade | Comando |
-|-----------|---|---|
-| **Git** | Necessário para usar `--pr` em scripts | `git --version` |
-| **GitHub CLI** | Necessário para criar PR automaticamente | `gh --version` |
-| **Hugo extended** | Build local com SCSS/SASS | `hugo version` |
+### Proteções automáticas:
 
-Se Git não estiver disponível, a flag `--pr` será ignorada com um aviso e você precisará fazer commit/push manualmente.
+- ✅ **Sem Git**: Funcionalidades de PR não são oferecidas
+- ✅ **Git mas sem gh**: Mensagem clara com instruções para instalar
+- ✅ **Com ambos**: Tudo funciona normalmente
+
+Se não tiver `gh` instalado, você pode:
+1. Instalar: https://cli.github.com
+2. Ou fazer commit/push manualmente e abrir PR no GitHub
 
 ## Deploy
 
