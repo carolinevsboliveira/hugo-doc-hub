@@ -11,41 +11,47 @@ from datetime import datetime
 
 PROMPTS = {
     "technical": """\
-Você é um engenheiro de software sênior documentando uma mudança de código.
+You are a senior software engineer documenting a code change.
 
-Analise o contexto abaixo e gere documentação técnica em Markdown com:
-- **Resumo** (2-3 linhas objetivas)
-- **Motivação e contexto** (por que foi feito)
-- **O que foi alterado** (arquivos, funções, endpoints afetados)
-- **Impacto técnico** (performance, segurança, breaking changes)
-- **Como testar** (comandos e casos relevantes)
-- **Dependências** (libs novas, env vars, migrações)
+Analyze the context below and generate technical documentation in Markdown with:
+- **Summary** (2-3 objective lines)
+- **Motivation and context** (why it was done)
+- **What was changed** (files, functions, endpoints affected)
+- **Technical impact** (performance, security, breaking changes)
+- **How to test** (commands and relevant test cases)
+- **Dependencies** (new libs, env vars, migrations)
 
-Use linguagem técnica precisa. Seja objetivo. Sem redundâncias.""",
+Use precise technical language. Be objective. No redundancies.
+
+NOTE: This document will be generated in all specified languages.""",
 
     "product": """\
-Você é um Product Manager documentando uma nova funcionalidade.
+You are a Product Manager documenting a new feature.
 
-Analise o contexto abaixo e gere documentação de produto em Markdown com:
-- **Nome da feature** (claro e direto)
-- **Problema que resolve** (perspectiva do usuário)
-- **Como funciona** (descrição funcional, sem jargão técnico)
-- **Quem é impactado** (times, usuários, integrações)
-- **Status e disponibilidade** (quando disponível, feature flags)
-- **Próximos passos** (se houver)
+Analyze the context below and generate product documentation in Markdown with:
+- **Feature name** (clear and direct)
+- **Problem it solves** (user perspective)
+- **How it works** (functional description, no technical jargon)
+- **Who is impacted** (teams, users, integrations)
+- **Status and availability** (when available, feature flags)
+- **Next steps** (if any)
 
-Use linguagem acessível. Foque em valor de negócio.""",
+Use accessible language. Focus on business value.
+
+NOTE: This document will be generated in all specified languages.""",
 
     "faq": """\
-Você é um especialista em suporte técnico criando uma FAQ.
+You are a technical support expert creating a FAQ.
 
-Analise o contexto abaixo e gere uma FAQ em Markdown com 5 a 10 perguntas e respostas.
-Inclua perguntas que desenvolvedores, QA e produto fariam.
-Respostas diretas e acionáveis.
+Analyze the context below and generate a FAQ in Markdown with 5 to 10 questions and answers.
+Include questions that developers, QA, and product teams would ask.
+Direct and actionable answers.
 
-Formato:
-### P: [pergunta]
-**R:** [resposta]""",
+Format:
+### Q: [question]
+**A:** [answer]
+
+NOTE: This FAQ will be generated in all specified languages.""",
 }
 
 FRONTMATTER = {

@@ -1,16 +1,16 @@
 # /doc-module
 
-Documenta um módulo ou pasta inteira do projeto. Ideal para onboarding, pós-refactor e auditoria de código legado.
+Documents a module or entire project folder. Ideal for onboarding, post-refactor, and legacy code audit.
 
-Suporta geração automática em todos os idiomas configurados via `SUPPORTED_LANGUAGES`.
+Supports automatic generation in all languages configured via `SUPPORTED_LANGUAGES`.
 
-## Uso
+## Usage
 
 ```
-/doc-module <caminho>
+/doc-module <path>
 ```
 
-**Exemplos:**
+**Examples:**
 ```
 /doc-module src/payments
 /doc-module .
@@ -18,17 +18,17 @@ Suporta geração automática em todos os idiomas configurados via `SUPPORTED_LA
 /doc-module src/auth --team team-auth
 ```
 
-**Parâmetros opcionais:**
-- `--team <id>` — time (detecta automaticamente se não informado)
-- `--languages <lang1,lang2>` — idiomas específicos (padrão: todos do SUPPORTED_LANGUAGES)
+**Optional parameters:**
+- `--team <id>` — team (auto-detected if not provided)
+- `--languages <lang1,lang2>` — specific languages (default: all from SUPPORTED_LANGUAGES)
 
 ---
 
-## O que fazer ao receber este comando
+## What to do when receiving this command
 
-### 1. Detectar configuração de i18n
+### 1. Detect i18n configuration
 
-Leia variáveis de ambiente ou carregue do `.env`:
+Read environment variables or load from `.env`:
 
 ```python
 from scripts.i18n_utils import load_i18n
@@ -38,38 +38,40 @@ primary_lang = i18n.get_primary_language()      # "pt-br"
 supported_langs = i18n.get_supported_languages() # ["pt-br", "en-us"]
 ```
 
-Se `--languages` foi passado, use apenas aqueles. Senão, use `SUPPORTED_LANGUAGES`.
+If `--languages` was passed, use only those. Otherwise, use `SUPPORTED_LANGUAGES`.
 
-### 2. Explorar o módulo (mínimo essencial)
+### 2. Explore the module (essential minimum)
 
-Leia:
+Read:
 ```bash
-find {caminho} -type f \( -name "*.ts" -o -name "*.js" -o -name "*.py" -o -name "*.go" \) | head -20
+find {path} -type f \( -name "*.ts" -o -name "*.js" -o -name "*.py" -o -name "*.go" \) | head -20
 ```
 
-Depois explore os principais arquivos (entry points e testes).
+Then explore the main files (entry points and tests).
 
-### 3. Gerar os arquivos em múltiplos idiomas
+### 3. Generate files in multiple languages
 
-Tipo sempre **technical**. Para cada idioma suportado:
+Always **technical** type. For each supported language:
 
 ```
-content/{lang}/teams/{team}/technical/module-{nome}-{slug}.md
+content/{lang}/teams/{team}/technical/module-{name}-{slug}.md
 ```
 
-Onde `{nome}` é o último segmento do caminho (ex: `src/payments` → `payments`).
+Where `{name}` is the last segment of the path (ex: `src/payments` → `payments`).
 
-**Exemplo:** Módulo `src/payments` em pt-br e en-us:
+**Example:** Module `src/payments` in pt-br and en-us:
 ```
 content/pt-br/teams/team-payments/technical/module-payments.md
 content/en-us/teams/team-payments/technical/module-payments.md
 ```
 
+**IMPORTANT:** The module documentation is generated in ALL specified languages.
+
 ---
 
 ## Templates
 
-### technical — Português (pt-br)
+### technical — Portuguese (pt-br)
 
 ```markdown
 ---
@@ -199,29 +201,29 @@ draft: false
 
 ---
 
-## Dependências
+## Dependencies
 
-- **Git** — para oferecer opção de PR (obrigatório)
-- **GitHub CLI (gh)** — para abrir PR automaticamente (obrigatório se usar PR)
-- **i18n_utils.py** — para carregar configuração de idiomas
+- **Git** — to offer PR option (optional)
+- **GitHub CLI (gh)** — to open PR automatically (required if using --pr)
+- **i18n_utils.py** — to load language configuration
 
-Se `gh` não estiver instalado mas o usuário escolher PR, mostre:
+If `gh` is not installed but the user chooses PR, show:
 ```
-❌ Erro: --pr requer GitHub CLI (gh) instalado
-Instale em https://cli.github.com
+❌ Error: --pr requires GitHub CLI (gh) to be installed
+Install at https://cli.github.com
 ```
 
 ---
 
-## Ao finalizar
+## Completion
 
-Mostre para cada idioma:
+Show for each language:
 ```
-✓ Módulo documentado em português (pt-br):
-  - content/pt-br/teams/{team}/technical/module-{nome}.md
+✓ Module documented in Portuguese (pt-br):
+  - content/pt-br/teams/{team}/technical/module-{name}.md
 
-✓ Módulo documentado em inglês (en-us):
-  - content/en-us/teams/{team}/technical/module-{nome}.md
+✓ Module documented in English (en-us):
+  - content/en-us/teams/{team}/technical/module-{name}.md
 ```
 
-Se apenas um idioma: mostre apenas aquele.
+If only one language: show only that one.
