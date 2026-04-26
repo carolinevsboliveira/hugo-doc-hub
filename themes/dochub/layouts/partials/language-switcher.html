@@ -3,7 +3,7 @@
   <select class="language-select" onchange="changeLanguage(this.value)">
     {{ range .Site.Languages }}
       {{ $langPrefix := "" }}
-      {{ if ne .Lang .Site.DefaultLanguage }}
+      {{ if ne .Lang $.Site.DefaultLanguage }}
         {{ $langPrefix = printf "/%s" .Lang }}
       {{ end }}
       {{ $currentPath := $.RelPermalink }}
