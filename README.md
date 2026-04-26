@@ -9,12 +9,17 @@ Documentação centralizada de todos os times — técnico, produto e FAQ.
 - **GitHub Actions** — build e deploy automático
 - **Netlify** — hospedagem
 
-## Desenvolvimento local
+## Setup inicial
 
 ```bash
-# Pré-requisito: Hugo extended instalado
-# https://gohugo.io/installation/
+# 1. Copiar .env.example para .env e atualizar valores
+cp .env.example .env
+# Edite .env com os dados da sua organização
 
+# 2. Rodar setup
+bash scripts/setup.sh
+
+# 3. Pronto! Rode localmente
 hugo server --buildDrafts
 # Acesse: http://localhost:1313
 ```
@@ -22,11 +27,7 @@ hugo server --buildDrafts
 ## Adicionar um novo time
 
 ```bash
-./scripts/register-team.sh \
-  --id team-nome \
-  --name "Nome do Time" \
-  --slack "#team-nome" \
-  --doc-types "technical,product,faq"
+bash scripts/register-team.sh --id team-xyz --name "Time XYZ" [--slack "#team-xyz"]
 ```
 
 ## Estrutura de conteúdo
