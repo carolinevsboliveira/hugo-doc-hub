@@ -9,7 +9,7 @@ echo "╚═══════════════════════�
 echo ""
 
 # Verifica se estamos na raiz
-if [[ ! -f "hugo.toml" || ! -d "content/teams" ]]; then
+if [[ ! -f "hugo.toml" || ! -d "content" || ! -d "data" ]]; then
     echo "Erro: rode este script na raiz do repositório."
     exit 1
 fi
