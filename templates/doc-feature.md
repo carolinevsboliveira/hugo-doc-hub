@@ -80,7 +80,18 @@ git diff main...{branch} | head -400
 find . -path ./node_modules -prune -o -name "*.test.*" -newer README.md -print | head -20
 ```
 
-### 6. Gerar os arquivos
+### 6. Carregar configuração de idiomas
+
+**CRITICAL:** Gere documentação em **TODOS os idiomas** configurados.
+
+```python
+from scripts.i18n_utils import load_i18n
+
+i18n = load_i18n()
+supported_langs = i18n.get_supported_languages()  # ["pt-br", "en-us"]
+```
+
+### 7. Gerar os arquivos em múltiplos idiomas
 
 Determine os tipos a gerar:
 - Default: `technical` e `product` sempre; `faq` se estiver em `DOC_TYPES` do `.dochubrc`
@@ -90,17 +101,42 @@ Se `faq` estiver nos tipos, pergunte antes de gerar:
 
 > Deseja gerar também o FAQ? (sim/não)
 
-Se a resposta for não, remova `faq` da lista.
+**Para CADA idioma em `supported_langs`** e **para CADA doc_type**, crie:
 
-Determine o caminho de destino dos arquivos:
-- Se `DOCHUB_PATH` estiver definido: salve em `$DOCHUB_PATH/content/teams/$TEAM/{doc_type}/feature-{slug}.md`
-- Caso contrário: salve em `/tmp/dochub-docs-feature-{slug}/{doc_type}/feature-{slug}.md`
+```
+content/{lang}/teams/{team}/{doc_type}/feature-{slug}.md
+```
+
+**EXEMPLO:** Feature "pix-support" com SUPPORTED_LANGUAGES="pt-br,en-us":
+```
+✓ content/pt-br/teams/team-payments/technical/feature-pix-support.md
+✓ content/pt-br/teams/team-payments/product/feature-pix-support.md
+✓ content/en-us/teams/team-payments/technical/feature-pix-support.md
+✓ content/en-us/teams/team-payments/product/feature-pix-support.md
+```
+
+❌ **ERRADO:** Criar sem idioma:
+```
+content/teams/team-payments/technical/feature-pix-support.md  ← FALTA IDIOMA
+```
 
 Onde `{slug}` = nome da feature em kebab-case, máximo 50 chars.
+⚠️ **CRITICAL:** Cada arquivo deve ter `language: "{lang}"` no frontmatter.
 
-### 7. Confirmar antes de abrir o PR
+### 8. Confirmar antes de abrir o PR
 
-Exiba os caminhos dos arquivos gerados e uma prévia de cada um (título e primeiras seções).
+Exiba os caminhos dos arquivos gerados **para CADA idioma e doc_type** e uma prévia de cada um (título e primeiras seções).
+
+**Exemplo de output:**
+```
+✓ Feature documentation in Portuguese (pt-br):
+  - content/pt-br/teams/team-payments/technical/feature-pix-support.md
+  - content/pt-br/teams/team-payments/product/feature-pix-support.md
+
+✓ Feature documentation in English (en-us):
+  - content/en-us/teams/team-payments/technical/feature-pix-support.md
+  - content/en-us/teams/team-payments/product/feature-pix-support.md
+```
 
 Em seguida, pergunte (padrão **não**):
 
