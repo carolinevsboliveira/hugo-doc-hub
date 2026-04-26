@@ -1,16 +1,16 @@
 # /doc-feature
 
-Gera documentação completa de uma feature — técnica, produto e FAQ — a partir de um ou mais PRs, uma branch ou um período.
+Generates complete feature documentation — technical, product, and FAQ — from one or more PRs, a branch, or a time period.
 
-Suporta geração automática em todos os idiomas configurados via `SUPPORTED_LANGUAGES`.
+Supports automatic generation in all languages configured via `SUPPORTED_LANGUAGES`.
 
-## Uso
+## Usage
 
 ```
-/doc-feature <nome-da-feature>
+/doc-feature <feature-name>
 ```
 
-**Exemplos:**
+**Examples:**
 ```
 /doc-feature pix-support
 /doc-feature sso-auth
@@ -18,19 +18,19 @@ Suporta geração automática em todos os idiomas configurados via `SUPPORTED_LA
 /doc-feature sso-auth --team team-auth --prs 150,151
 ```
 
-**Parâmetros opcionais:**
-- `--prs <n1,n2,n3>` — números de PRs específicos
-- `--branch <nome>` — ou use uma branch em vez de PRs
-- `--team <id>` — time (detecta automaticamente se não informado)
-- `--languages <lang1,lang2>` — idiomas específicos (padrão: todos do SUPPORTED_LANGUAGES)
+**Optional parameters:**
+- `--prs <n1,n2,n3>` — specific PR numbers
+- `--branch <name>` — or use a branch instead of PRs
+- `--team <id>` — team (auto-detected if not provided)
+- `--languages <lang1,lang2>` — specific languages (default: all from SUPPORTED_LANGUAGES)
 
 ---
 
-## O que fazer ao receber este comando
+## What to do when receiving this command
 
-### 1. Detectar configuração de i18n
+### 1. Detect i18n configuration
 
-Leia variáveis de ambiente ou carregue do `.env`:
+Read environment variables or load from `.env`:
 
 ```python
 from scripts.i18n_utils import load_i18n
@@ -40,16 +40,16 @@ primary_lang = i18n.get_primary_language()      # "pt-br"
 supported_langs = i18n.get_supported_languages() # ["pt-br", "en-us"]
 ```
 
-Se `--languages` foi passado, use apenas aqueles. Senão, use `SUPPORTED_LANGUAGES`.
+If `--languages` was passed, use only those. Otherwise, use `SUPPORTED_LANGUAGES`.
 
-### 2. Uma pergunta só
+### 2. Ask once only
 
-Se não informado `--prs` ou `--branch`: **pergunta uma vez apenas**:
-- "Quais PRs? (ex: 138,141,145) Ou deixe em branco para usar a branch atual."
+If `--prs` or `--branch` not provided: **ask once only**:
+- "Which PRs? (ex: 138,141,145) Or leave blank to use current branch."
 
-### 3. Coletar contexto
+### 3. Collect context
 
-**Se PRs foram informados:**
+**If PRs were provided:**
 ```bash
 for pr in $PRS; do
   gh pr view $pr --json number,title,body,files,additions,deletions
@@ -57,31 +57,31 @@ for pr in $PRS; do
 done
 ```
 
-**Se branch foi informada:**
+**If branch was provided:**
 ```bash
 git log main..{branch} --oneline
 git diff main...{branch} --stat
 git diff main...{branch} | head -400
 ```
 
-**Sempre leia também os arquivos de teste** — eles revelam o comportamento esperado:
+**Always read test files too** — they reveal expected behavior:
 ```bash
 find . -path ./node_modules -prune -o -name "*.test.*" -newer README.md -print | head -20
 ```
 
-### 4. Gerar os arquivos em múltiplos idiomas
+### 4. Generate files in multiple languages
 
-Sempre gera **technical** e **product**. Gera **faq** se estiver nos `doc_types` do time em `data/teams.yaml`.
+Always generates **technical** and **product**. Generates **faq** if it's in the team's `doc_types` in `data/teams.yaml`.
 
-**Para cada idioma suportado:**
+**For each supported language:**
 
 ```
 content/{lang}/teams/{team}/technical/feature-{slug}.md
 content/{lang}/teams/{team}/product/feature-{slug}.md
-content/{lang}/teams/{team}/faq/faq-{slug}.md        ← se faq estiver ativo
+content/{lang}/teams/{team}/faq/faq-{slug}.md        ← if faq is active
 ```
 
-**Exemplo:** Feature "pix-support" com 2 idiomas:
+**Example:** Feature "pix-support" in 2 languages:
 ```
 content/pt-br/teams/team-payments/technical/feature-pix-support.md
 content/pt-br/teams/team-payments/product/feature-pix-support.md
@@ -92,11 +92,13 @@ content/en-us/teams/team-payments/product/feature-pix-support.md
 content/en-us/teams/team-payments/faq/faq-pix-support.md
 ```
 
+**IMPORTANT:** Each document type is generated in ALL specified languages.
+
 ---
 
 ## Templates
 
-### technical — Português (pt-br)
+### technical — Portuguese (pt-br)
 
 ```markdown
 ---
@@ -194,31 +196,31 @@ draft: false
 
 ---
 
-## Dependências
+## Dependencies
 
-- **Git** — para oferecer opção de PR (obrigatório)
-- **GitHub CLI (gh)** — para abrir PR automaticamente (obrigatório se usar PR)
-- **i18n_utils.py** — para carregar configuração de idiomas
+- **Git** — to offer PR option (optional)
+- **GitHub CLI (gh)** — to open PR automatically (required if using --pr)
+- **i18n_utils.py** — to load language configuration
 
-Se `gh` não estiver instalado mas o usuário escolher PR, mostre:
+If `gh` is not installed but the user chooses PR, show:
 ```
-❌ Erro: --pr requer GitHub CLI (gh) instalado
-Instale em https://cli.github.com
+❌ Error: --pr requires GitHub CLI (gh) to be installed
+Install at https://cli.github.com
 ```
 
 ---
 
-## Ao finalizar
+## Completion
 
-Mostre para cada idioma:
+Show for each language:
 ```
-✓ Documentação de feature criada em português (pt-br):
+✓ Feature documentation created in Portuguese (pt-br):
   - content/pt-br/teams/{team}/technical/feature-{slug}.md
   - content/pt-br/teams/{team}/product/feature-{slug}.md
 
-✓ Documentação de feature criada em inglês (en-us):
+✓ Feature documentation created in English (en-us):
   - content/en-us/teams/{team}/technical/feature-{slug}.md
   - content/en-us/teams/{team}/product/feature-{slug}.md
 ```
 
-Se apenas um idioma: mostre apenas aquele.
+If only one language: show only that one.

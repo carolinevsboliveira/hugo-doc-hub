@@ -1,34 +1,34 @@
 # /doc-pr
 
-Gera documentação técnica, de produto e/ou FAQ a partir de um PR do GitHub.
+Generates technical, product, and/or FAQ documentation from a GitHub PR.
 
-Suporta geração automática em todos os idiomas configurados via `SUPPORTED_LANGUAGES`.
+Supports automatic generation in all languages configured via `SUPPORTED_LANGUAGES`.
 
-## Uso
+## Usage
 
 ```
-/doc-pr <número>
+/doc-pr <number>
 ```
 
-**Exemplos:**
+**Examples:**
 ```
 /doc-pr 142
 /doc-pr 142 --languages pt-br,en-us
 /doc-pr 142 --team team-payments --only technical
 ```
 
-**Parâmetros opcionais:**
-- `--team <id>` — time (detecta automaticamente se não informado)
-- `--only <tipo>` — gera apenas um tipo (technical/product/faq, padrão: todos)
-- `--languages <lang1,lang2>` — idiomas específicos (padrão: todos do SUPPORTED_LANGUAGES)
+**Optional parameters:**
+- `--team <id>` — team (auto-detected if not provided)
+- `--only <type>` — generate only one type (technical/product/faq, default: all)
+- `--languages <lang1,lang2>` — specific languages (default: all from SUPPORTED_LANGUAGES)
 
 ---
 
-## O que fazer ao receber este comando
+## What to do when receiving this command
 
-### 1. Detectar configuração de i18n
+### 1. Detect i18n configuration
 
-Leia variáveis de ambiente ou carregue do `.env`:
+Read environment variables or load from `.env`:
 
 ```python
 from scripts.i18n_utils import load_i18n
@@ -38,42 +38,42 @@ primary_lang = i18n.get_primary_language()      # "pt-br"
 supported_langs = i18n.get_supported_languages() # ["pt-br", "en-us"]
 ```
 
-Se `--languages` foi passado, use apenas aqueles. Senão, use `SUPPORTED_LANGUAGES`.
+If `--languages` was passed, use only those. Otherwise, use `SUPPORTED_LANGUAGES`.
 
-### 2. Validar parâmetros
+### 2. Validate parameters
 
-- `número` — obrigatório. Número do PR.
-- `--team` — se não informado: tenta detectar do primeiro time em `data/teams.yaml` ou **pergunta uma vez** ao usuário.
-- `--only` — se não informado: usa todos os `doc_types` do time.
+- `number` — required. PR number.
+- `--team` — if not provided: try to detect from the first team in `data/teams.yaml` or **ask once**.
+- `--only` — if not provided: use all `doc_types` for the team.
 
-### 3. Coletar contexto do PR (simplificado)
+### 3. Collect PR context (simplified)
 
-Se `gh` estiver disponível:
+If `gh` is available:
 ```bash
-gh pr view $NUMERO --json number,title,body,changedFiles
-gh pr diff $NUMERO | head -300
+gh pr view $NUMBER --json number,title,body,changedFiles
+gh pr diff $NUMBER | head -300
 ```
 
-Se não: **pergunta rápida**:
-- "Qual é o título do PR?"
-- "Qual é a descrição/mudanças principais?" (uma frase)
+If not: **quick questions**:
+- "What is the PR title?"
+- "What is the description/main changes?" (one phrase)
 
-(Contexto mínimo é suficiente — Claude completa as lacunas.)
+(Minimal context is sufficient — Claude completes the gaps.)
 
-### 4. Determinar os tipos a gerar
+### 4. Determine doc types to generate
 
-Consulte `data/teams.yaml` para o time informado e use os `doc_types` registrados.
-Se `--only` foi passado, filtre para apenas aqueles tipos.
+Check `data/teams.yaml` for the specified team and use the registered `doc_types`.
+If `--only` was passed, filter to only those types.
 
-### 5. Gerar os arquivos em múltiplos idiomas
+### 5. Generate files in multiple languages
 
-**Para cada idioma suportado**, gere os arquivos:
+**For each supported language**, generate files:
 
 ```
-content/{lang}/teams/{team}/{doc_type}/pr-{número}-{slug}.md
+content/{lang}/teams/{team}/{doc_type}/pr-{number}-{slug}.md
 ```
 
-**Exemplo:** PR #142 "Add PIX payment support" do team-payments em pt-br e en-us:
+**Example:** PR #142 "Add PIX payment support" from team-payments in pt-br and en-us:
 ```
 content/pt-br/teams/team-payments/technical/pr-142-add-pix-payment-support.md
 content/pt-br/teams/team-payments/product/pr-142-add-pix-payment-support.md
@@ -81,9 +81,11 @@ content/en-us/teams/team-payments/technical/pr-142-add-pix-payment-support.md
 content/en-us/teams/team-payments/product/pr-142-add-pix-payment-support.md
 ```
 
-### 6. Usar tradução de títulos e metadados
+**IMPORTANT:** Each document type is generated in ALL specified languages. One Claude API call generates the content once, then it's included in all language versions.
 
-Para cada idioma, traduza os títulos de seção usando o módulo i18n:
+### 6. Use translation for section titles and metadata
+
+For each language, translate section titles using the i18n module:
 
 ```python
 i18n = load_i18n()
@@ -93,19 +95,19 @@ title_product = i18n.translate("doc.product", language="pt-br")      # "Produto"
 
 ---
 
-## Templates por tipo e idioma
+## Templates by type and language
 
-### technical — Português (pt-br)
+### technical — Portuguese (pt-br)
 
 ```markdown
 ---
-title: "{título do PR}"
-date: {data ISO 8601 atual}
+title: "{PR title}"
+date: {current ISO 8601 date}
 team: "{team}"
 project: "{project}"
 doc_type: "technical"
 scope: "pr"
-pr: "{número}"
+pr: "{number}"
 language: "pt-br"
 tags: []
 draft: false
@@ -199,31 +201,31 @@ Focus on intent, not mechanical file listing.]
 
 ---
 
-## Dependências
+## Dependencies
 
-- **Git** — para oferecer opção de PR (obrigatório)
-- **GitHub CLI (gh)** — para abrir PR automaticamente (obrigatório se usar PR)
-- **i18n_utils.py** — para carregar configuração de idiomas
+- **Git** — to offer PR option (optional)
+- **GitHub CLI (gh)** — to open PR automatically (required if using --pr)
+- **i18n_utils.py** — to load language configuration
 
-Se `gh` não estiver instalado mas o usuário escolher PR, mostre:
+If `gh` is not installed but the user chooses PR, show:
 ```
-❌ Erro: --pr requer GitHub CLI (gh) instalado
-Instale em https://cli.github.com
+❌ Error: --pr requires GitHub CLI (gh) to be installed
+Install at https://cli.github.com
 ```
 
 ---
 
-## Ao finalizar
+## Completion
 
-Mostre para cada idioma:
+Show for each language:
 ```
-✓ Documentação criada em português (pt-br):
+✓ Documentation created in Portuguese (pt-br):
   - content/pt-br/teams/{team}/technical/...
   - content/pt-br/teams/{team}/product/...
 
-✓ Documentação criada em inglês (en-us):
+✓ Documentation created in English (en-us):
   - content/en-us/teams/{team}/technical/...
   - content/en-us/teams/{team}/product/...
 ```
 
-Se apenas um idioma: mostre apenas aquele.
+If only one language: show only that one.
