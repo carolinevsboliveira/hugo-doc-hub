@@ -178,6 +178,19 @@ Inclua perguntas sobre casos de borda e erros comuns visíveis no diff.]
 
 ---
 
+## Dependências
+
+- **Git** — para oferecer opção de PR (obrigatório)
+- **GitHub CLI (gh)** — para abrir PR automaticamente (obrigatório se usar PR)
+
+Se `gh` não estiver instalado mas o usuário escolher PR, mostre:
+```
+❌ Erro: --pr requer GitHub CLI (gh) instalado
+Instale em https://cli.github.com
+```
+
+---
+
 ## Ao finalizar
 
 Mostre: ✓ Documentação criada em `content/teams/{team}/...`

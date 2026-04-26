@@ -23,10 +23,20 @@ while [[ $# -gt 0 ]]; do
     esac
 done
 
-# Se --pr foi passado mas git não está disponível, desabilita PR
-if [[ "$OPEN_PR" == true ]] && ! command -v git &> /dev/null; then
-    echo "⚠ Aviso: Git não encontrado. A opção --pr foi ignorada."
-    OPEN_PR=false
+# Valida disponibilidade de ferramentas para --pr
+if [[ "$OPEN_PR" == true ]]; then
+    if ! command -v git &> /dev/null; then
+        echo "❌ Erro: --pr requer Git instalado"
+        exit 1
+    fi
+    if ! command -v gh &> /dev/null; then
+        echo "❌ Erro: --pr requer GitHub CLI (gh) instalado"
+        echo ""
+        echo "Instale em https://cli.github.com ou use:"
+        echo "  bash register-team.sh --id $TEAM_ID --name '$TEAM_NAME' # sem --pr"
+        echo "  Depois faça commit e push manualmente"
+        exit 1
+    fi
 fi
 
 # Validação básica

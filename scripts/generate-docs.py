@@ -143,12 +143,17 @@ def is_git_available() -> bool:
         return False
 
 
-def open_pr(context: dict, output_dir: Path, project: str, team: str) -> None:
-    """Abre um PR com a documentação gerada."""
-    if not is_git_available():
-        print("⚠ Aviso: Git não encontrado. A opção --pr foi ignorada.")
-        return
+def is_gh_available() -> bool:
+    """Verifica se GitHub CLI está disponível no sistema."""
+    try:
+        subprocess.run(["gh", "--version"], capture_output=True, check=True)
+        return True
+    except (FileNotFoundError, subprocess.CalledProcessError):
+        return False
 
+
+def open_pr(context: dict, output_dir: Path, project: str, team: str) -> None:
+    """Abre um PR com a documentação gerada (Git e gh já validados upfront)."""
     pr_number = context.get("pr_number", "push")
     pr_title = context.get("pr_title", f"docs: {project}")
 
@@ -167,22 +172,18 @@ def open_pr(context: dict, output_dir: Path, project: str, team: str) -> None:
         subprocess.run(["git", "add", str(output_dir)], check=True)
         subprocess.run(["git", "commit", "-m", f"docs: {project} — {pr_title}"], check=True)
 
-        # Tenta abrir PR com GitHub CLI
-        try:
-            result = subprocess.run(
-                ["gh", "pr", "create",
-                 "--head", branch,
-                 "--base", "main",
-                 "--title", f"docs: {pr_title}",
-                 "--body", f"Documentação automática gerada para {project}\n\nTimes: {team}"],
-                capture_output=True,
-                text=True,
-                check=True
-            )
-            print(f"✓ PR aberto: {result.stdout.strip()}")
-        except FileNotFoundError:
-            print(f"⚠ GitHub CLI (gh) não encontrado. Commit criado na branch '{branch}'.")
-            print(f"  Faça o push manualmente: git push -u origin {branch}")
+        # Abre PR com GitHub CLI (já validado upfront)
+        result = subprocess.run(
+            ["gh", "pr", "create",
+             "--head", branch,
+             "--base", "main",
+             "--title", f"docs: {pr_title}",
+             "--body", f"Documentação automática gerada para {project}\n\nTimes: {team}"],
+            capture_output=True,
+            text=True,
+            check=True
+        )
+        print(f"✓ PR aberto: {result.stdout.strip()}")
     except subprocess.CalledProcessError as e:
         print(f"✗ Erro ao abrir PR: {e}")
         raise
@@ -197,6 +198,19 @@ def main():
     parser.add_argument("--output", required=True)
     parser.add_argument("--pr", action="store_true", help="Abrir PR com a documentação gerada")
     args = parser.parse_args()
+
+    # Valida --pr cedo, antes de gerar docs
+    if args.pr:
+        if not is_git_available():
+            print("❌ Erro: --pr requer Git instalado")
+            exit(1)
+        if not is_gh_available():
+            print("❌ Erro: --pr requer GitHub CLI (gh) instalado")
+            print()
+            print("Instale em https://cli.github.com ou execute sem --pr:")
+            print("  python scripts/generate-docs.py ... (sem --pr)")
+            print("  Depois faça commit e push manualmente")
+            exit(1)
 
     with open(args.context) as f:
         context = json.load(f)

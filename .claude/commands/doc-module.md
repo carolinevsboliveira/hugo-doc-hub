@@ -108,6 +108,19 @@ draft: false
 
 ---
 
+## Dependências
+
+- **Git** — para oferecer opção de PR (obrigatório)
+- **GitHub CLI (gh)** — para abrir PR automaticamente (obrigatório se usar PR)
+
+Se `gh` não estiver instalado mas o usuário escolher PR, mostre:
+```
+❌ Erro: --pr requer GitHub CLI (gh) instalado
+Instale em https://cli.github.com
+```
+
+---
+
 ## Ao finalizar
 
 Mostre: ✓ Módulo documentado em `content/teams/{team}/technical/module-{nome}.md`
