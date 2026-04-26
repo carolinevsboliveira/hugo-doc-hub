@@ -1,0 +1,14 @@
+{
+  "pr_number": "123",
+  "pr_title": "API de pagamentos — nova integração com Stripe",
+  "pr_body": "Implementa integração com Stripe para processamento de pagamentos recorrentes.\n\nMudanças principais:\n- Novo endpoint POST /payments\n- Webhook para notificações de status\n- Retry automático em falhas transitórias",
+  "changed_files": [
+    "src/payments/stripe.ts",
+    "src/api/routes/payments.ts",
+    "tests/payments.test.ts"
+  ],
+  "diff_summary": "Adicionadas 450 linhas. Nova integração com Stripe, tratamento de erros, testes unitários.",
+  "readme": "# Payments API\n\nProcessamento de pagamentos via Stripe.\n\n## Endpoints\n- `POST /payments` - Criar pagamento\n- `GET /payments/:id` - Status do pagamento",
+  "tags": ["stripe", "payments", "api"],
+  "pr_title_simplified": "Stripe integration"
+}

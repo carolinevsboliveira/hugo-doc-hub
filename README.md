@@ -45,8 +45,21 @@ bash scripts/register-team.sh --id team-xyz --name "Time XYZ" --pr
 
 ## Gerar documentação com Claude
 
+### ✨ Modo simplificado (recomendado)
+
 ```bash
-# Gera docs (técnica, produto, FAQ) via Claude API
+bash scripts/generate-docs-interactive.sh
+```
+
+O script faz perguntas interativas e:
+- ✅ Detecta projeto automaticamente
+- ✅ Coleta contexto de forma amigável
+- ✅ Simplifica o JSON
+- ✅ Oferece abrir PR automaticamente
+
+### Modo avançado (linha de comando)
+
+```bash
 python scripts/generate-docs.py \
   --context context.json \
   --doc-types "technical,product,faq" \
@@ -64,8 +77,23 @@ python scripts/generate-docs.py \
   --pr
 ```
 
+**Formato do contexto (JSON simplificado):**
+
+Ver exemplo em `scripts/context-example.json`:
+```json
+{
+  "pr_number": "123",
+  "pr_title": "Titulo da mudança",
+  "pr_body": "Descrição detalhada",
+  "changed_files": ["src/file1.ts", "src/file2.ts"],
+  "diff_summary": "Resumo das mudanças",
+  "readme": "README atual do projeto (opcional)",
+  "tags": ["tag1", "tag2"]
+}
+```
+
 **Parâmetros:**
-- `--context` *(obrigatório)* — arquivo JSON com contexto do PR
+- `--context` *(obrigatório)* — arquivo JSON com contexto
 - `--doc-types` *(obrigatório)* — tipos a gerar (ex: `technical,product,faq`)
 - `--project` *(obrigatório)* — nome do projeto
 - `--team` *(obrigatório)* — ID do time
