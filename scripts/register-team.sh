@@ -4,6 +4,14 @@
 
 set -e
 
+# Helper function to trim whitespace
+trim() {
+    local var="$1"
+    var="${var#"${var%%[![:space:]]*}"}"   # Remove leading whitespace
+    var="${var%"${var##*[![:space:]]}"}"   # Remove trailing whitespace
+    printf '%s' "$var"
+}
+
 # Helper function to get translations
 translate() {
     local key="$1"
@@ -103,7 +111,9 @@ fi
 DOC_TYPES_YAML="["
 IFS=',' read -ra DT_LIST <<< "$TEAM_DOC_TYPES"
 for dt in "${DT_LIST[@]}"; do
-    DOC_TYPES_YAML="${DOC_TYPES_YAML}${dt// /}, "
+    dt=$(trim "$dt")
+    [[ -z "$dt" ]] && continue
+    DOC_TYPES_YAML="${DOC_TYPES_YAML}${dt}, "
 done
 DOC_TYPES_YAML="${DOC_TYPES_YAML%, }]"
 
@@ -117,7 +127,9 @@ DOC_TYPES_YAML="${DOC_TYPES_YAML%, }]"
         echo "    repos:"
         IFS=',' read -ra REPO_LIST <<< "$TEAM_REPOS"
         for repo in "${REPO_LIST[@]}"; do
-            echo "      - ${repo// /}"
+            repo=$(trim "$repo")
+            [[ -z "$repo" ]] && continue
+            echo "      - ${repo}"
         done
     fi
     echo "    doc_types: ${DOC_TYPES_YAML}"
@@ -131,7 +143,8 @@ SUPPORTED_LANGS="${SUPPORTED_LANGUAGES:-${LANGUAGE_CODE:-pt-br}}"
 
 IFS=',' read -ra LANGS <<< "$SUPPORTED_LANGS"
 for lang in "${LANGS[@]}"; do
-    lang="${lang// /}"
+    lang=$(trim "$lang")
+    [[ -z "$lang" ]] && continue
 
     # Criar diretório base do time para este idioma
     mkdir -p "content/${lang}/teams/${TEAM_ID}"
@@ -152,7 +165,8 @@ TEAM_EOF
     # Cria seções por doc_type
     IFS=',' read -ra DT_LIST <<< "$TEAM_DOC_TYPES"
     for dt in "${DT_LIST[@]}"; do
-        dt="${dt// /}"
+        dt=$(trim "$dt")
+        [[ -z "$dt" ]] && continue
         mkdir -p "content/${lang}/teams/${TEAM_ID}/$dt"
 
         # Traduzir o título do doc_type
@@ -206,7 +220,8 @@ if [[ "$OPEN_PR" == true ]]; then
     SUPPORTED_LANGS="${SUPPORTED_LANGUAGES:-${LANGUAGE_CODE:-pt-br}}"
     IFS=',' read -ra LANGS <<< "$SUPPORTED_LANGS"
     for lang in "${LANGS[@]}"; do
-        lang="${lang// /}"
+        lang=$(trim "$lang")
+        [[ -z "$lang" ]] && continue
         git add "content/${lang}/teams/${TEAM_ID}" 2>/dev/null || true
     done
 
