@@ -13,6 +13,35 @@ translate() {
     printf "$translation\n" "$@"
 }
 
+# Helper function to initialize teams.yaml with correct YAML structure
+init_teams_file() {
+    local teams_file="data/teams.yaml"
+
+    # Create file if it doesn't exist
+    if [[ ! -f "$teams_file" ]]; then
+        cat > "$teams_file" <<EOF
+teams:
+EOF
+        return
+    fi
+
+    # Check if file has invalid structure (empty list or malformed)
+    if grep -q "^teams: \[\]" "$teams_file" || [[ ! -s "$teams_file" ]]; then
+        cat > "$teams_file" <<EOF
+teams:
+EOF
+        return
+    fi
+
+    # Check if file starts with 'teams:' key
+    if ! grep -q "^teams:" "$teams_file"; then
+        # File doesn't have the correct structure, initialize it
+        cat > "$teams_file" <<EOF
+teams:
+EOF
+    fi
+}
+
 TEAM_ID=""
 TEAM_NAME=""
 TEAM_SLACK=""
@@ -52,7 +81,16 @@ fi
 : "${TEAM_ID:?$(translate "register.error_missing_id")}"
 : "${TEAM_NAME:?$(translate "register.error_missing_name")}"
 
-[[ ! -f "data/teams.yaml" ]] && echo "$(translate "register.error_not_in_docs_hub")" && exit 1
+# Initialize teams.yaml if needed
+if [[ ! -f "data/teams.yaml" ]]; then
+    if [[ ! -d "data" ]]; then
+        echo "$(translate "register.error_not_in_docs_hub")"
+        exit 1
+    fi
+    init_teams_file
+else
+    init_teams_file
+fi
 
 TEAM_ID="${TEAM_ID// /}"
 
